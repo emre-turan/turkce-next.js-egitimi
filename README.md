@@ -1,5 +1,6 @@
 <h1 align="center">
   <img alt="logo" src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg" width="224px"/>
+<br>
 
 Türkçe Next.js Eğitimi (App Router - Uygulama Yönlendiricisi)
 
@@ -1152,4 +1153,3 @@ Bilmekte fayda var:
 - Birden fazla kök düzen arasında gezinmek tam sayfa yüklemesine neden olacaktır. Yani, `app/(shop)/layout.js` kullanan `/cart` sayfasından `app/(marketing)/layout.js` kullanan `/blog` sayfasına gitmek tam sayfa yüklemeye neden olur. Bu durum, yalnızca birden fazla kök düzen için geçerlidir ve istemci tarafı gezinmenin aksine çalışır.
 
 ## Metadata
-
