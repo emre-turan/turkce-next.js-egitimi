@@ -1,10 +1,8 @@
 # Sayfalar ve Düzenler
 
-Next.js 13 içindeki Uygulama Yönlendiricisi, [sayfaları](#sayfalar), [paylaşılan düzenleri](#düzenler) ve [şablonları](#şablonlar) kolayca oluşturmak için yeni dosya kurallarını tanıttı. Bu bölüm, Next.js uygulamanızda bu özel dosyaları nasıl kullanacağınız konusunda size rehberlik edecektir.
-
 ## Sayfalar
 
-Sayfa, bir rotaya **özgü** kullanıcı arayüzüdür. Bir `page.js` dosyasından bir bileşeni dışa aktararak sayfaları tanımlayabilirsiniz. Bir [rota tanımlamak](#rotaların-tanımlanması) için iç içe klasörler ve rotayı genel erişime açmak için bir `page.js` dosyası kullanın.
+Sayfa, bir rotaya **özgü** kullanıcı arayüzüdür. Bir `page.js` dosyasından bir bileşeni dışa aktararak sayfaları tanımlayabilirsiniz. Bir rota tanımlamak için iç içe klasörler ve rotayı genel erişime açmak için bir `page.js` dosyası kullanın.
 
 `app` dizini içine bir `page.js` dosyası ekleyerek ilk sayfanızı oluşturun:
 
@@ -51,10 +49,10 @@ export default function DashboardLayout({
 
 Bilmekte fayda var:
 
-- En üstteki düzen [Kök Düzen](#kök-düzeni-gerekli) olarak adlandırılır. Bu **gerekli** düzen, bir uygulamadaki tüm sayfalarda paylaşılır. Kök düzenler `html` ve `body` etiketlerini içermelidir.
+- En üstteki düzen Kök Düzen olarak adlandırılır. Bu **gerekli** düzen, bir uygulamadaki tüm sayfalarda paylaşılır. Kök düzenler `html` ve `body` etiketlerini içermelidir.
 - Herhangi bir rota segmenti isteğe bağlı olarak kendi Düzenini tanımlayabilir. Bu düzenler o segmentteki tüm sayfalarda paylaşılır.
 - Bir rotadaki düzenler varsayılan olarak **iç içedir**. Her üst düzen, React `children` prop kullanarak altındaki alt düzenleri sarar.
-- Paylaşılan düzenlere belirli rota segmentlerini dahil etmek ve hariç tutmak için [Rota Gruplarını](#rota-grupları) kullanabilirsiniz.
+- Paylaşılan düzenlere belirli rota segmentlerini dahil etmek ve hariç tutmak için Rota Gruplarını kullanabilirsiniz.
 - Düzenler varsayılan olarak Sunucu Bileşenleridir ancak İstemci Bileşeni olarak ayarlanabilir.
 - Düzenler veri getirebilir.
 - Bir üst düzen ile onun alt düzenleri arasında veri aktarımı mümkün değildir. Bununla birlikte, aynı verileri bir rotada birden fazla kez getirebilirsiniz ve React, performansı etkilemeden istekleri otomatik olarak çıkaracaktır.
@@ -84,9 +82,9 @@ Bilmekte fayda var:
 
 - `app` dizini **mutlaka** bir kök düzen içermelidir.
 - Next.js `<html>` ve `<body>` etiketlerini otomatik olarak oluşturmadığı için mutlaka kök düzen tanımlamalıdır.
-- `<head>` HTML öğelerini yönetmek için [yerleşik SEO desteğini](#metadata) kullanabilirsiniz, örneğin, `<title>` öğesi.
-- Birden fazla kök düzen oluşturmak için [rota gruplarını](#rota-grupları) kullanabilirsiniz.
-- Kök düzen varsayılan olarak bir [Sunucu Bileşenidir](#sunucu-server-bileşenleri) ve [İstemci Bileşeni](#i̇stemci-client-bileşenleri) olarak ayarlanamaz.
+- `<head>` HTML öğelerini yönetmek için yerleşik SEO desteğini kullanabilirsiniz, örneğin, `<title>` öğesi.
+- Birden fazla kök düzen oluşturmak için rota gruplarınıkullanabilirsiniz.
+- Kök düzen varsayılan olarak bir Sunucu Bileşenidir ve İstemci Bileşeni olarak ayarlanamaz.
 
 ## İç içe Düzenler
 
@@ -110,7 +108,7 @@ Yukarıdaki iki düzeni birleştirecek olursanız, kök düzen (`app/layout.js`)
 
 <img alt="düzenler" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fnested-layouts-ui.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
-[Rota Gruplarını](#rota-grupları), belirli rota segmentlerini paylaşılan düzenlere dahil etmek ve bu düzenlerden çıkarmak için kullanabilirsiniz.
+Rota Gruplarını, belirli rota segmentlerini paylaşılan düzenlere dahil etmek ve bu düzenlerden çıkarmak için kullanabilirsiniz.
 
 ## Şablonlar
 
@@ -145,7 +143,7 @@ Bir düzen ve şablona sahip bir rota segmentinin işlenmiş çıktısı bu şek
 
 ## `<head>`'in değiştirilmesi
 
-`app` dizininde, [yerleşik SEO desteğini](#metadata) kullanarak `başlık` ve `meta` gibi `<head>` HTML öğelerini değiştirebilirsiniz.
+`app` dizininde, yerleşik SEO desteğini kullanarak `başlık` ve `meta` gibi `<head>` HTML öğelerini değiştirebilirsiniz.
 
 Meta veriler, bir `layout.js` veya `page.js` dosyasında bir meta veri nesnesi veya `generateMetadata` işlevi dışa aktarılarak tanımlanabilir.
 

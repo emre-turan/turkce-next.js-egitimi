@@ -1,4 +1,4 @@
-# React Temelleri
+# React'ın Temelleri (React Essentials)
 
 Next.js ile uygulama geliştirmek için React'in Sunucu Bileşenleri gibi yeni özelliklerine aşina olmak bize yardımcı olacaktır. Bu bölümde, Sunucu ve İstemci Bileşenleri arasındaki farkları, ne zaman kullanılacaklarını ve önerilen kalıpları inceleyeceğiz.
 
@@ -18,23 +18,27 @@ Sayfayı daha küçük bileşenlere ayıracak olursak, bileşenlerin çoğunun e
 
 ## Neden Sunucu Bileşenleri?
 
-Peki, neden Sunucu Bileşenleri diye düşünüyor olabilirsiniz. İstemci Bileşenleri yerine bunları kullanmanın avantajları nelerdir?
+Evet, Sunucu Bileşenlerinin ne olduğunu ve neden önemli olduklarını anlamak önemlidir. İstemci Bileşenlerinin aksine, Sunucu Bileşenleri, uygulamanın sunucu tarafında çalışır ve kullanıcının tarayıcısına sadece HTML gönderir. Bu, bir dizi fayda sağlar:
 
-Sunucu Bileşenleri, geliştiricilerin sunucu altyapısından daha iyi yararlanmasını sağlar. Örneğin, veri getirmeyi sunucuya, veritabanınıza daha yakın bir yere taşıyabilir ve daha önce istemci JavaScript paketinin boyutunu etkileyecek büyük bağımlılıkları sunucuda tutarak performansı artırabilirsiniz. Sunucu Bileşenleri, bir React uygulaması yazmayı PHP veya Ruby on Rails'e benzer hale getirir, ancak bunu React'in gücü ve esnekliği ve kullanıcı arayüzünü şablonlamak için bileşenler modeli ile yapar.
+**Verimlilik:** Sunucu Bileşenleri, veri getirme işlemlerini sunucuya taşıyarak, veritabanınıza daha yakın bir yerde çalışmasını sağlar. Bu, veri getirme sürelerini azaltabilir ve uygulamanın genel performansını artırabilir.
 
-Sunucu Bileşenleri ile ilk sayfa yüklemesi daha hızlıdır ve istemci tarafı JavaScript paketinin boyutu küçülür. Temel istemci tarafı çalışma zamanı önbelleğe alınabilir ve tahmin edilebilir boyuttadır ve uygulamanız büyüdükçe artmaz. Ek JavaScript yalnızca uygulamanızda İstemci Bileşenleri aracılığıyla istemci tarafı etkileşimi kullanıldıkça eklenir.
+**Performans:** Sunucu Bileşenleri, büyük JavaScript kütüphanelerini sunucuda tutarak, istemci tarafı JavaScript paketinin boyutunu azaltabilir. Bu, sayfa yükleme sürelerini hızlandırabilir ve kullanıcı deneyimini iyileştirebilir.
 
-Next.js ile bir rota yüklendiğinde, ilk HTML sunucuda oluşturulur. Bu HTML daha sonra tarayıcıda aşamalı olarak geliştirilir ve istemcinin Next.js ve React istemci tarafı çalışma zamanını eşzamansız olarak yükleyerek uygulamayı devralmasına ve etkileşim eklemesine olanak tanır.
+**Esneklik:** Sunucu Bileşenleri, geliştiricilere, PHP veya Ruby on Rails gibi geleneksel sunucu tarafı dilinde yazılmış bir uygulamayı oluşturma hissi verir, ancak bunu React'in bileşen tabanlı modeli ve gücü ile yapar.
 
-Sunucu Bileşenlerine geçişi kolaylaştırmak için, özel dosyalar ve ortak konumlandırılmış bileşenler de dahil olmak üzere, Uygulama Yönlendiricisi içindeki tüm bileşenler varsayılan olarak Sunucu Bileşenleridir. Bu, ekstra bir çalışma yapmadan bunları otomatik olarak benimsemenize ve hali hazırda mükemmel bir performans elde etmenize olanak tanır. İsteğe bağlı olarak 'use client' yönergesini kullanarak İstemci Bileşenleri de tercih edebilirsiniz.
+**Ölçeklenebilirlik:** Sunucu Bileşenleri, uygulamanız büyüdükçe JavaScript paketinin boyutunu artırmaz. Bu, uygulamanın ölçeklenebilirliğini artırır ve büyük uygulamaların yönetilmesini kolaylaştırır.
 
-## İstemci Bileşenleri
+Next.js ile, bir rota yüklendiğinde, ilk HTML sunucuda oluşturulur ve daha sonra tarayıcıda aşamalı olarak geliştirilir. Bu, uygulamanın hızlı bir şekilde yüklenmesini ve kullanıcı etkileşimine hızlı bir şekilde yanıt vermesini sağlar.
+
+Sunucu Bileşenlerine geçiş yapmak, Next.js'in Uygulama Yönlendiricisi sayesinde kolaydır. Uygulama Yönlendiricisi, tüm bileşenleri varsayılan olarak Sunucu Bileşenleri olarak işler, bu da onları otomatik olarak benimsemenizi ve hızlı bir şekilde performans kazanmanızı sağlar. İsteğe bağlı olarak, 'use client' yönergesini kullanarak İstemci Bileşenlerini de tercih edebilirsiniz.
+
+## İstemci (Client) Bileşenleri
 
 İstemci Bileşenleri, uygulamanıza istemci tarafı etkileşim eklemenizi sağlar. Next.js'te, bunlar sunucuda önceden oluşturulur (Pre-Render) ve istemci tarafında canlandırılır (hydration). İstemci Bileşenlerini, Sayfalar Yönlendiricisindeki bileşenlerin her zaman çalıştığı şekilde olduğunu düşünebilirsiniz.
 
 ### "use client" yönergesi
 
-`"use client"` yönergesi, Sunucu ve İstemci Bileşen modül grafiği arasında bir sınır bildirmek için kullanılan bir kuraldır.
+`"use client"` yönergesi, Sunucu ve İstemci Bileşen modül grafiği arasında bir sınır belirlemek için kullanılır. Bu, kodun hangi kısmının sunucuda ve hangi kısmının istemci tarafında çalışacağını belirlememize yardımcı olur.
 
 ```typescript
 "use client";
@@ -84,9 +88,9 @@ Aşağıdaki tablo, Sunucu ve İstemci Bileşenleri için farklı kullanım duru
 
 ## İstemci Bileşenlerini Yapraklara Taşıma
 
-Uygulamanızın performansını artırmak için, İstemci Bileşenlerini mümkün olduğunca bileşen ağacınızın yapraklarına taşımanız önerilir.
+Uygulamanızın performansını optimize etmek için, İstemci Bileşenlerini mümkün olduğunca bileşen ağacınızın yapraklarına taşımanız önerilir. Bu, uygulamanızın genel JavaScript yükünü azaltır ve sayfa yükleme sürelerini hızlandırır.
 
-Örneğin, statik öğelere sahip bir Yerleşim (Layout) (ör. logo, linkler, vb.) ve durum kullanabilen etkileşimli bir arama çubuğunuz olabilir.
+Örneğin, statik öğelere sahip bir Yerleşim (Layout) bileşeniniz (örneğin logo, linkler vb.) ve durum kullanabilen etkileşimli bir arama çubuğunuz olabilir.
 
 Tüm düzeni bir İstemci Bileşeni yapmak yerine, etkileşimli mantığı bir İstemci Bileşenine (örneğin `<SearchBar />`) taşıyın ve düzeninizi bir Sunucu Bileşeni olarak tutun. Bu, düzenin tüm bileşen Javascript'ini istemciye göndermek zorunda olmadığınız anlamına gelir.
 
@@ -116,16 +120,16 @@ Sunucu ve İstemci Bileşenleri aynı bileşen ağacında birleştirilebilir.
 
 React, perde arkasında render işlemini aşağıdaki gibi gerçekleştirir:
 
-1. **Sunucuda React**, sonucu istemciye göndermeden önce tüm Sunucu Bileşenlerini işler.
+- **Sunucuda React**, sonucu istemciye göndermeden önce tüm Sunucu Bileşenlerini işler.
 
-- Buna İstemci Bileşenleri içinde yer alan Sunucu Bileşenleri de dahildir.
-- Bu aşamada karşılaşılan İstemci Bileşenleri atlanır.
+  - Buna İstemci Bileşenleri içinde yer alan Sunucu Bileşenleri de dahildir.
+  - Bu aşamada karşılaşılan İstemci Bileşenleri atlanır.
 
-2. **İstemcide**, React İstemci Bileşenlerini işler ve Sunucu Bileşenlerinin işlenmiş sonucundaki yuvaları, sunucuda ve istemcide yapılan işi birleştirir.
+- **İstemcide**, React İstemci Bileşenlerini işler ve Sunucu Bileşenlerinin işlenmiş sonucundaki yuvaları, sunucuda ve istemcide yapılan işi birleştirir.
 
-- Herhangi bir Sunucu Bileşeni bir İstemci Bileşeninin içine yerleştirilmişse, işlenen içerikler İstemci Bileşeninin içine doğru şekilde yerleştirilecektir.
+  - Herhangi bir Sunucu Bileşeni bir İstemci Bileşeninin içine yerleştirilmişse, işlenen içerikler İstemci Bileşeninin içine doğru şekilde yerleştirilecektir.
 
-Bilmekte fayda var:
+**Bilmekte fayda var:**
 
 Next.js'de, ilk sayfa yüklemesi sırasında, hem yukarıdaki adımdaki Sunucu Bileşenlerinin işlenmiş sonucu hem de İstemci Bileşenleri, daha hızlı bir ilk sayfa yüklemesi üretmek için sunucuda HTML olarak önceden işlenir.
 
@@ -135,13 +139,11 @@ Yukarıda özetlenen işleme akışı göz önüne alındığında, bir Sunucu B
 
 ### Desteklenmeyen Model: Sunucu Bileşenlerini İstemci Bileşenlerinin İçine Aktarma
 
-Aşağıdaki model desteklenmez. Bir Sunucu Bileşenini bir İstemci Bileşeninin içine aktaramazsınız:
+Aşağıdaki model desteklenmez. Bir Sunucu Bileşenini bir İstemci Bileşeninin içine **aktaramazsınız**:
 
 ```typescript
 "use client";
 
-// Bu düzen çalışmaz!!!!
-// Bir Sunucu Bileşenini bir İstemci Bileşeninin içine aktaramazsınız.
 import ExampleServerComponent from "./example-server-component";
 
 export default function ExampleClientComponent({
@@ -198,8 +200,6 @@ export default function ExampleClientComponent({
 Bir üst Sunucu Bileşeninde, hem `<ExampleClientComponent>` hem de `<ExampleServerComponent>` öğelerini içe aktarabilir ve `<ExampleServerComponent>` öğesini `<ExampleClientComponent>` öğesinin bir alt öğesi olarak geçirebilirsiniz:
 
 ```typescript
-// Bu düzen çalışır!!!!:
-// Bir Sunucu Bileşenini, bir İstemci Bileşeninin alt öğesi veya prop'u olarak iletebilirsiniz.
 import ExampleClientComponent from "./example-client-component";
 import ExampleServerComponent from "./example-server-component";
 
@@ -217,14 +217,14 @@ Bu yaklaşımla, `<ExampleClientComponent>` ve `<ExampleServerComponent>` öğel
 
 Bilmekte fayda var:
 
-1. Bu model, `children` prop ile [düzenlerde ve sayfalarda](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) zaten uygulanmaktadır, bu nedenle ek bir sarmalayıcı bileşen oluşturmanız gerekmez.
-2. React bileşenlerini (JSX) diğer bileşenlere aktarmak yeni bir kavram değildir ve her zaman React kompozisyon modelinin bir parçası olmuştur.
-3. Bu kompozisyon stratejisi, Sunucu ve İstemci Bileşenleri arasında çalışır çünkü prop'u alan bileşenin prop'un ne olduğu hakkında hiçbir bilgisi yoktur. Yalnızca kendisine aktarılan şeyin nereye yerleştirilmesi gerektiğinden sorumludur.
+- Bu model, `children` prop ile düzenlerde ve sayfalarda zaten uygulanmaktadır, bu nedenle ek bir sarmalayıcı bileşen oluşturmanız gerekmez.
+- React bileşenlerini (JSX) diğer bileşenlere aktarmak yeni bir kavram değildir ve her zaman React kompozisyon modelinin bir parçası olmuştur.
+- Bu kompozisyon stratejisi, Sunucu ve İstemci Bileşenleri arasında çalışır çünkü prop'u alan bileşenin prop'un ne olduğu hakkında hiçbir bilgisi yoktur. Yalnızca kendisine aktarılan şeyin nereye yerleştirilmesi gerektiğinden sorumludur.
 
-- Bu da aktarılan prop'un bağımsız olarak, bu durumda sunucuda, İstemci Bileşeni istemcide render edilmeden çok önce render edilmesini sağlar.
-- Aynı "içeriği yukarı kaldırma" stratejisi, içe aktarılan iç içe geçmiş bir alt bileşeni yeniden işleyen bir üst bileşendeki durum değişikliklerini önlemek için kullanılmıştır.
+  - Bu da aktarılan prop'un bağımsız olarak, bu durumda sunucuda, İstemci Bileşeni istemcide render edilmeden çok önce render edilmesini sağlar.
+  - Aynı "içeriği yukarı kaldırma" stratejisi, içe aktarılan iç içe geçmiş bir alt bileşeni yeniden işleyen bir üst bileşendeki durum değişikliklerini önlemek için kullanılmıştır.
 
-4. Sadece `children` prop ile sınırlı değilsiniz. JSX iletmek için herhangi bir prop kullanabilirsiniz.
+- Sadece `children` prop ile sınırlı değilsiniz. JSX iletmek için herhangi bir prop kullanabilirsiniz.
 
 ## Sunucudan İstemci Bileşenlerine Props iletimi (Serileştirme)
 
@@ -258,7 +258,7 @@ Sonuç olarak, `getData()` istemciye aktarılıp çalıştırılabilse de beklen
 
 Bu nedenle, bu işlev yalnızca sunucuda çalıştırılmak üzere yazılmıştır.
 
-### "server-only" paketi
+## "server-only" paketi
 
 Sunucu kodunun bu tür istenmeyen istemci kullanımını önlemek için, diğer geliştiricilere bu modüllerden birini yanlışlıkla bir İstemci Bileşenine içe aktarmaları durumunda derleme zamanı hatası vermek için `server-only` paketini kullanabiliriz.
 

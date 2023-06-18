@@ -1,4 +1,3 @@
-
 # Bağlama ve Gezinme (Linking and Navigating)
 
 Next.js yönlendiricisi, istemci tarafında gezinme ile sunucu merkezli yönlendirme kullanır. Anlık yükleme durumlarını ve eş zamanlı görüntülemeyi destekler.
@@ -115,7 +114,7 @@ export default function Page() {
 
 ## Navigasyon Nasıl Çalışır?
 
-- `<Link> `kullanılarak veya `router.push()` çağrısı yapılarak bir rota geçişi başlatılır.
+- `<Link>`kullanılarak veya `router.push()` çağrısı yapılarak bir rota geçişi başlatılır.
 - Yönlendirici, tarayıcının adres çubuğundaki URL'yi günceller.
 - Yönlendirici, istemci tarafı önbelleğindeki değişmeyen bölümleri (ör. paylaşılan düzenler) yeniden kullanarak gereksiz çalışmayı önler. Bu aynı zamanda kısmi işleme olarak da adlandırılır.
 - Yumuşak gezinme koşulları karşılanırsa, yönlendirici yeni segmenti sunucu yerine önbellekten alır. Değilse, yönlendirici sert bir gezinme gerçekleştirir ve Sunucu Bileşeni yükünü sunucudan alır.

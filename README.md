@@ -260,7 +260,7 @@ Bu yaklaşımla, `<ExampleClientComponent>` ve `<ExampleServerComponent>` öğel
 
 Bilmekte fayda var:
 
-- Bu model, `children` prop ile [düzenlerde ve sayfalarda](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) zaten uygulanmaktadır, bu nedenle ek bir sarmalayıcı bileşen oluşturmanız gerekmez.
+- Bu model, `children` prop ile düzenlerde ve sayfalarda zaten uygulanmaktadır, bu nedenle ek bir sarmalayıcı bileşen oluşturmanız gerekmez.
 - React bileşenlerini (JSX) diğer bileşenlere aktarmak yeni bir kavram değildir ve her zaman React kompozisyon modelinin bir parçası olmuştur.
 - Bu kompozisyon stratejisi, Sunucu ve İstemci Bileşenleri arasında çalışır çünkü prop'u alan bileşenin prop'un ne olduğu hakkında hiçbir bilgisi yoktur. Yalnızca kendisine aktarılan şeyin nereye yerleştirilmesi gerektiğinden sorumludur.
 
@@ -608,13 +608,9 @@ Bunun yerine, veri getirme işlemini veriyi tüketen bileşenin yanında konumla
 
 # Yönlendirme Temelleri (Routing Fundamentals)
 
-Her uygulamanın iskeleti yönlendirmedir (routing). Bu bölümde size web için yönlendirmenin temel kavramları ve Next.js'de yönlendirmenin nasıl ele alınacağı anlatılacaktır.
-
 ## Terminoloji
 
-Öncelikle, bu terimlerin dokümantasyon boyunca kullanıldığını göreceksiniz. İşte hızlı bir referans:
-
-<img alt="yönlendirme-temelleri" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fterminology-component-tree.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
+<img alt="yönlendirme-temelleri" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fterminology-component-tree.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ"/><br/>
 
 - **Ağaç (tree)**: Hiyerarşik bir yapıyı görselleştirmek için kullanılan bir kural. Örneğin, üst ve alt bileşenleri olan bir bileşen ağacı, bir klasör yapısı vb.
 - **Alt ağaç (Subtree)**: Yeni bir kökten (ilk) başlayan ve yapraklarda (son) biten bir ağacın parçası.
@@ -632,23 +628,19 @@ Next.js, 13. sürümde React Sunucu Bileşenleri üzerine inşa edilen ve payla�
 
 Uygulama Yönlendiricisi, `app` adlı yeni bir dizinde çalışır. `app` dizini, aşamalı uyarlamaya izin vermek için `pages` dizini ile birlikte çalışır. Bu, uygulamanızın bazı rotalarını yeni davranışa seçerken diğer rotaları önceki davranış için `pages` dizininde tutmanıza olanak tanır.
 
-Bilmekte fayda var:
-
 Uygulama Yönlendiricisi, Sayfa Yönlendiricisine göre önceliklidir. Dizinler arasındaki yönlendirmeler aynı URL yoluna çözümlenmemelidir ve bir çakışmayı önlemek için derleme zamanı hatasına neden olur.
 
 <img alt="uygulama-yönlendiricisi" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fnext-router-directories.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
-Varsayılan olarak, uygulama içindeki bileşenler React [Sunucu Bileşenleridir](#sunucu-server-bileşenleri). Bu bir performans optimizasyonudur ve bunları kolayca benimsemenizi sağlar ve ayrıca [İstemci Bileşenlerini](#i̇stemci-client-bileşenleri) de kullanabilirsiniz.
-
-**Öneri**: Sunucu Bileşenleri konusunda yeniyseniz [Sunucu ve İstemci Bileşenleri](#reactın-temelleri-react-essentials) bölümüne göz atın.
+Varsayılan olarak, uygulama içindeki bileşenler React Sunucu Bileşenleridir. Bu bir performans optimizasyonudur ve bunları kolayca benimsemenizi sağlar ve ayrıca İstemci Bileşenlerini de kullanabilirsiniz.
 
 ## Klasörlerin ve Dosyaların Rolleri
 
 Next.js dosya sistemi tabanlı bir yönlendirici kullanır:
 
-- **Klasörler** rotaları tanımlamak için kullanılır. Rota, **kök klasörden** `page.js` dosyasını içeren son bir **yaprak klasöre** kadar dosya sistemi hiyerarşisini takip eden, iç içe geçmiş klasörlerden oluşan tek bir yoldur. [Rotaları Tanımlama]() bölümüne bakın.
+- **Klasörler** rotaları tanımlamak için kullanılır. Rota, **kök klasörden** `page.js` dosyasını içeren son bir **yaprak klasöre** kadar dosya sistemi hiyerarşisini takip eden, iç içe geçmiş klasörlerden oluşan tek bir yoldur. 
 
-**Dosyalar**, bir rota segmenti için gösterilen kullanıcı arayüzünü oluşturmak için kullanılır. Bkz. [özel dosyalar]().
+- **Dosyalar**, bir rota segmenti için gösterilen kullanıcı arayüzünü oluşturmak için kullanılır.
 
 ## Rota Segmentleri
 
@@ -711,17 +703,13 @@ Bunun nedeni, klasörler rotaları tanımlarken, yalnızca `page.js` veya `route
 
 <img alt="ortak yerleşim" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-colocation.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
-[Proje Organizasyonu ve Ortak Yerleşim]() hakkında daha fazla bilgi edinin.
-
 ## İstemci Tarafında Gezinme ile Sunucu Merkezli Yönlendirme
 
-İstemci tarafı yönlendirme kullanan `pages` dizininin aksine, `app router`, [Sunucu Bileşenleri](#sunucu-server-bileşenleri) ve [sunucuda veri getirme]() ile uyum sağlamak için **sunucu merkezli yönlendirme** kullanır. Sunucu merkezli yönlendirme ile istemcinin bir rota haritası indirmesi gerekmez ve Sunucu Bileşenleri için aynı istek rotaları aramak için kullanılabilir. Bu optimizasyon tüm uygulamalar için yararlıdır, ancak çok sayıda rotaya sahip uygulamalar üzerinde daha büyük bir etkiye sahiptir.
+İstemci tarafı yönlendirme kullanan `pages` dizininin aksine, `app router`, Sunucu Bileşenleri ve sunucuda veri getirme ile uyum sağlamak için **sunucu merkezli yönlendirme** kullanır. Sunucu merkezli yönlendirme ile istemcinin bir rota haritası indirmesi gerekmez ve Sunucu Bileşenleri için aynı istek rotaları aramak için kullanılabilir. Bu optimizasyon tüm uygulamalar için yararlıdır, ancak çok sayıda rotaya sahip uygulamalar üzerinde daha büyük bir etkiye sahiptir.
 
-Yönlendirme sunucu merkezli olmasına rağmen, yönlendirici, Tek Sayfalı Uygulama davranışına benzeyen [Bağlantı Bileşeni]() ile **istemci tarafında gezinmeyi** kullanır. Bu, bir kullanıcı yeni bir rotaya gittiğinde tarayıcının sayfayı yeniden yüklemeyeceği anlamına gelir. Bunun yerine, URL güncellenecek ve Next.js yalnızca değişen bölümleri oluşturacaktır.
+Yönlendirme sunucu merkezli olmasına rağmen, yönlendirici, Tek Sayfalı Uygulama davranışına benzeyen Bağlantı Bileşeni ile **istemci tarafında gezinmeyi** kullanır. Bu, bir kullanıcı yeni bir rotaya gittiğinde tarayıcının sayfayı yeniden yüklemeyeceği anlamına gelir. Bunun yerine, URL güncellenecek ve Next.js yalnızca değişen bölümleri oluşturacaktır.
 
-Ayrıca, kullanıcılar uygulamada gezinirken, yönlendirici React Sunucu Bileşeni yükünün sonucunu **bellek içi istemci tarafı önbelleğinde** saklar. Önbellek, herhangi bir seviyede geçersiz kılmaya izin veren ve [React'in eşzamanlı render](https://react.dev/blog/2022/03/29/react-v18#what-is-concurrent-react)'ları arasında tutarlılık sağlayan rota segmentlerine bölünmüştür. Bu, belirli durumlarda, daha önce getirilmiş bir segmentin önbelleğinin yeniden kullanılabileceği ve performansı daha da artıracağı anlamına gelir.
-
-[Bağlantı ve Gezinme]() hakkında daha fazla bilgi edinin.
+Ayrıca, kullanıcılar uygulamada gezinirken, yönlendirici React Sunucu Bileşeni yükünün sonucunu **bellek içi istemci tarafı önbelleğinde** saklar. Önbellek, herhangi bir seviyede geçersiz kılmaya izin veren ve React'in eşzamanlı render'ları arasında tutarlılık sağlayan rota segmentlerine bölünmüştür. Bu, belirli durumlarda, daha önce getirilmiş bir segmentin önbelleğinin yeniden kullanılabileceği ve performansı daha da artıracağı anlamına gelir.
 
 ## Kısmi Rendering
 
@@ -735,26 +723,20 @@ Kısmi rendering olmadan, her gezinti tüm sayfanın sunucuda yeniden işlenmesi
 
 Uygulama Yönlendirici ayrıca daha gelişmiş yönlendirme modellerini uygulamanıza yardımcı olacak bir dizi kural sunar. Bunlar şunları içerir:
 
-- [Paralel Rotalar](): Aynı görünümde bağımsız olarak gezinilebilen iki veya daha fazla sayfayı aynı anda göstermenizi sağlar. Bunları, kendi alt navigasyonları olan bölünmüş görünümler için kullanabilirsiniz. Örn. gösterge tabloları.
-- [Rotaları Kesme](): Bir rotayı kesmenize ve başka bir rota bağlamında göstermenize izin verir. Geçerli sayfanın bağlamını korumak önemli olduğunda bunları kullanabilirsiniz. Örneğin, bir görevi düzenlerken tüm görevleri görmek veya bir akıştaki bir fotoğrafı genişletmek.
-
-Bu modeller, daha zengin ve daha karmaşık kullanıcı arayüzleri oluşturmanıza olanak tanıyarak, geçmişte küçük ekipler ve bireysel geliştiriciler tarafından uygulanması karmaşık olan özellikleri demokratikleştirir.
+- Paralel Rotalar: Aynı görünümde bağımsız olarak gezinilebilen iki veya daha fazla sayfayı aynı anda göstermenizi sağlar. Bunları, kendi alt navigasyonları olan bölünmüş görünümler için kullanabilirsiniz. Örn. gösterge tabloları.
+- Rotaları Kesme: Bir rotayı kesmenize ve başka bir rota bağlamında göstermenize izin verir. Geçerli sayfanın bağlamını korumak önemli olduğunda bunları kullanabilirsiniz. Örneğin, bir görevi düzenlerken tüm görevleri görmek veya bir akıştaki bir fotoğrafı genişletmek.
 
 # Rotaların Tanımlanması
-
-Devam etmeden önce [Yönlendirme Temelleri](#yönlendirme-temelleri-routing-fundamentals) bölümünün okunması önerilir.
-
-Bu bölüm, Next.js uygulamanızda rotaları nasıl tanımlayacağınız ve düzenleyeceğiniz konusunda size rehberlik edecektir.
 
 ## Rotalar Oluşturma
 
 Next.js, rotaları tanımlamak için **klasörlerin** kullanıldığı dosya sistemi tabanlı bir yönlendirici kullanır.
 
-Her klasör, bir **URL** segmentiyle eşleşen bir [rota segmentini](#rota-segmentleri) temsil eder. [İç içe bir rota](#i̇ç-i̇çe-rotalar) oluşturmak için, klasörleri birbirinin içine yerleştirebilirsiniz.
+Her klasör, bir **URL** segmentiyle eşleşen bir rota segmentini temsil eder. İç içe bir rota oluşturmak için, klasörleri birbirinin içine yerleştirebilirsiniz.
 
 <img alt="rotalar oluşturma" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Froute-segments-to-path-segments.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
-Rota segmentlerini genel erişime açmak için özel bir [`page.js` dosyası](#sayfalar) kullanılır.
+Rota segmentlerini genel erişime açmak için özel bir `page.js` dosyası kullanılır.
 
 <img alt="rotalar oluşturma-2" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fdefining-routes.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
@@ -762,7 +744,7 @@ Bu örnekte, `/dashboard/analytics` URL yolu, karşılık gelen bir `page.js` do
 
 ## Kullanıcı Arayüzü Oluşturma
 
-Her bir rota segmenti için kullanıcı arayüzü oluşturmak üzere [özel dosya kuralları](#dosya-kuralları) kullanılır. En yaygın olanları, bir rotaya özgü kullanıcı arayüzünü gösteren [sayfalar](#sayfalar) ve birden fazla rotada paylaşılan kullanıcı arayüzünü gösteren [düzenlerdir](#düzenler).
+Her bir rota segmenti için kullanıcı arayüzü oluşturmak üzere özel dosya kuralları kullanılır. En yaygın olanları, bir rotaya özgü kullanıcı arayüzünü gösteren sayfalar ve birden fazla rotada paylaşılan kullanıcı arayüzünü gösteren düzenlerdir.
 
 Örneğin, ilk sayfanızı oluşturmak için `app` dizininin içine bir `page.js` dosyası ekleyin ve bir React bileşenini dışa aktarın:
 
@@ -774,11 +756,9 @@ export default function Page() {
 
 # Sayfalar ve Düzenler
 
-Next.js 13 içindeki Uygulama Yönlendiricisi, [sayfaları](#sayfalar), [paylaşılan düzenleri](#düzenler) ve [şablonları](#şablonlar) kolayca oluşturmak için yeni dosya kurallarını tanıttı. Bu bölüm, Next.js uygulamanızda bu özel dosyaları nasıl kullanacağınız konusunda size rehberlik edecektir.
-
 ## Sayfalar
 
-Sayfa, bir rotaya **özgü** kullanıcı arayüzüdür. Bir `page.js` dosyasından bir bileşeni dışa aktararak sayfaları tanımlayabilirsiniz. Bir [rota tanımlamak](#rotaların-tanımlanması) için iç içe klasörler ve rotayı genel erişime açmak için bir `page.js` dosyası kullanın.
+Sayfa, bir rotaya **özgü** kullanıcı arayüzüdür. Bir `page.js` dosyasından bir bileşeni dışa aktararak sayfaları tanımlayabilirsiniz. Bir rota tanımlamak için iç içe klasörler ve rotayı genel erişime açmak için bir `page.js` dosyası kullanın.
 
 `app` dizini içine bir `page.js` dosyası ekleyerek ilk sayfanızı oluşturun:
 
@@ -825,10 +805,10 @@ export default function DashboardLayout({
 
 Bilmekte fayda var:
 
-- En üstteki düzen [Kök Düzen](#kök-düzeni-gerekli) olarak adlandırılır. Bu **gerekli** düzen, bir uygulamadaki tüm sayfalarda paylaşılır. Kök düzenler `html` ve `body` etiketlerini içermelidir.
+- En üstteki düzen Kök Düzen olarak adlandırılır. Bu **gerekli** düzen, bir uygulamadaki tüm sayfalarda paylaşılır. Kök düzenler `html` ve `body` etiketlerini içermelidir.
 - Herhangi bir rota segmenti isteğe bağlı olarak kendi Düzenini tanımlayabilir. Bu düzenler o segmentteki tüm sayfalarda paylaşılır.
 - Bir rotadaki düzenler varsayılan olarak **iç içedir**. Her üst düzen, React `children` prop kullanarak altındaki alt düzenleri sarar.
-- Paylaşılan düzenlere belirli rota segmentlerini dahil etmek ve hariç tutmak için [Rota Gruplarını](#rota-grupları-route-groups) kullanabilirsiniz.
+- Paylaşılan düzenlere belirli rota segmentlerini dahil etmek ve hariç tutmak için Rota Gruplarını kullanabilirsiniz.
 - Düzenler varsayılan olarak Sunucu Bileşenleridir ancak İstemci Bileşeni olarak ayarlanabilir.
 - Düzenler veri getirebilir.
 - Bir üst düzen ile onun alt düzenleri arasında veri aktarımı mümkün değildir. Bununla birlikte, aynı verileri bir rotada birden fazla kez getirebilirsiniz ve React, performansı etkilemeden istekleri otomatik olarak çıkaracaktır.
@@ -858,9 +838,9 @@ Bilmekte fayda var:
 
 - `app` dizini **mutlaka** bir kök düzen içermelidir.
 - Next.js `<html>` ve `<body>` etiketlerini otomatik olarak oluşturmadığı için mutlaka kök düzen tanımlamalıdır.
-- `<head>` HTML öğelerini yönetmek için [yerleşik SEO desteğini](#metadata) kullanabilirsiniz, örneğin, `<title>` öğesi.
-- Birden fazla kök düzen oluşturmak için [rota gruplarını](#rota-grupları-route-groups) kullanabilirsiniz.
-- Kök düzen varsayılan olarak bir [Sunucu Bileşenidir](#sunucu-server-bileşenleri) ve [İstemci Bileşeni](#i̇stemci-client-bileşenleri) olarak ayarlanamaz.
+- `<head>` HTML öğelerini yönetmek için yerleşik SEO desteğini kullanabilirsiniz, örneğin, `<title>` öğesi.
+- Birden fazla kök düzen oluşturmak için rota gruplarınıkullanabilirsiniz.
+- Kök düzen varsayılan olarak bir Sunucu Bileşenidir ve İstemci Bileşeni olarak ayarlanamaz.
 
 ## İç içe Düzenler
 
@@ -884,7 +864,7 @@ Yukarıdaki iki düzeni birleştirecek olursanız, kök düzen (`app/layout.js`)
 
 <img alt="düzenler" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fnested-layouts-ui.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
-[Rota Gruplarını](#rota-grupları-route-groups), belirli rota segmentlerini paylaşılan düzenlere dahil etmek ve bu düzenlerden çıkarmak için kullanabilirsiniz.
+Rota Gruplarını, belirli rota segmentlerini paylaşılan düzenlere dahil etmek ve bu düzenlerden çıkarmak için kullanabilirsiniz.
 
 ## Şablonlar
 
@@ -919,7 +899,7 @@ Bir düzen ve şablona sahip bir rota segmentinin işlenmiş çıktısı bu şek
 
 ## `<head>`'in değiştirilmesi
 
-`app` dizininde, [yerleşik SEO desteğini](#metadata) kullanarak `başlık` ve `meta` gibi `<head>` HTML öğelerini değiştirebilirsiniz.
+`app` dizininde, yerleşik SEO desteğini kullanarak `başlık` ve `meta` gibi `<head>` HTML öğelerini değiştirebilirsiniz.
 
 Meta veriler, bir `layout.js` veya `page.js` dosyasında bir meta veri nesnesi veya `generateMetadata` işlevi dışa aktarılarak tanımlanabilir.
 
@@ -1152,4 +1132,3 @@ Bilmekte fayda var:
 - Eğer birden fazla kök düzeniniz varsa ve üst düzey bir `layout.js` dosyanız yoksa, ana `page.js` dosyanız rota gruplarından birinde tanımlanmalıdır. Örneğin: `app/(marketing)/page.js.`
 - Birden fazla kök düzen arasında gezinmek tam sayfa yüklemesine neden olacaktır. Yani, `app/(shop)/layout.js` kullanan `/cart` sayfasından `app/(marketing)/layout.js` kullanan `/blog` sayfasına gitmek tam sayfa yüklemeye neden olur. Bu durum, yalnızca birden fazla kök düzen için geçerlidir ve istemci tarafı gezinmenin aksine çalışır.
 
-## Metadata
