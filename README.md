@@ -7,8 +7,6 @@ Türkçe Next.js Eğitimi (App Router - Uygulama Yönlendiricisi)
 
 Bu repo, Next.js'in büyülü dünyasına adım atmak isteyenler için özenle hazırlanmış bir öğrenme yolculuğudur. Bu eğitim serisi, Next.js'in temel yapılarını ve özelliklerini, anlaşılır örnekler ve açıklamalarla ele alır.
 
-<!-- Bu yolculukta, X farklı konuyu keşfedeceğiz ve her birini detaylı bir şekilde inceleyeceğiz. -->
-
 Bu eğitim serisi, Next.js'i öğrenmek ve ustalaşmak isteyenlere, adım adım bir rehber sunmayı amaçlar. Her bir konu, detaylı ve anlaşılır bir şekilde ele alınmıştır, böylece okuyucuların Next.js'i etkin ve hızlı bir şekilde öğrenmeleri hedeflenir.
 
 <!-- Bu eğitim serisini aynı zamanda (gitbook linki) web sitesinden de takip edebilirsiniz. -->
@@ -62,15 +60,19 @@ Sayfayı daha küçük bileşenlere ayıracak olursak, bileşenlerin çoğunun e
 
 ## Neden Sunucu Bileşenleri?
 
-Peki, neden Sunucu Bileşenleri diye düşünüyor olabilirsiniz. İstemci Bileşenleri yerine bunları kullanmanın avantajları nelerdir?
+Evet, Sunucu Bileşenlerinin ne olduğunu ve neden önemli olduklarını anlamak önemlidir. İstemci Bileşenlerinin aksine, Sunucu Bileşenleri, uygulamanın sunucu tarafında çalışır ve kullanıcının tarayıcısına sadece HTML gönderir. Bu, bir dizi fayda sağlar:
 
-Sunucu Bileşenleri, geliştiricilerin sunucu altyapısından daha iyi yararlanmasını sağlar. Örneğin, veri getirmeyi sunucuya, veritabanınıza daha yakın bir yere taşıyabilir ve daha önce istemci JavaScript paketinin boyutunu etkileyecek büyük bağımlılıkları sunucuda tutarak performansı artırabilirsiniz. Sunucu Bileşenleri, bir React uygulaması yazmayı PHP veya Ruby on Rails'e benzer hale getirir, ancak bunu React'in gücü ve esnekliği ve kullanıcı arayüzünü şablonlamak için bileşenler modeli ile yapar.
+**Verimlilik:** Sunucu Bileşenleri, veri getirme işlemlerini sunucuya taşıyarak, veritabanınıza daha yakın bir yerde çalışmasını sağlar. Bu, veri getirme sürelerini azaltabilir ve uygulamanın genel performansını artırabilir.
 
-Sunucu Bileşenleri ile ilk sayfa yüklemesi daha hızlıdır ve istemci tarafı JavaScript paketinin boyutu küçülür. Temel istemci tarafı çalışma zamanı önbelleğe alınabilir ve tahmin edilebilir boyuttadır ve uygulamanız büyüdükçe artmaz. Ek JavaScript yalnızca uygulamanızda İstemci Bileşenleri aracılığıyla istemci tarafı etkileşimi kullanıldıkça eklenir.
+**Performans:** Sunucu Bileşenleri, büyük JavaScript kütüphanelerini sunucuda tutarak, istemci tarafı JavaScript paketinin boyutunu azaltabilir. Bu, sayfa yükleme sürelerini hızlandırabilir ve kullanıcı deneyimini iyileştirebilir.
 
-Next.js ile bir rota yüklendiğinde, ilk HTML sunucuda oluşturulur. Bu HTML daha sonra tarayıcıda aşamalı olarak geliştirilir ve istemcinin Next.js ve React istemci tarafı çalışma zamanını eşzamansız olarak yükleyerek uygulamayı devralmasına ve etkileşim eklemesine olanak tanır.
+**Esneklik:** Sunucu Bileşenleri, geliştiricilere, PHP veya Ruby on Rails gibi geleneksel sunucu tarafı dilinde yazılmış bir uygulamayı oluşturma hissi verir, ancak bunu React'in bileşen tabanlı modeli ve gücü ile yapar.
 
-Sunucu Bileşenlerine geçişi kolaylaştırmak için, özel dosyalar ve ortak konumlandırılmış bileşenler de dahil olmak üzere, Uygulama Yönlendiricisi içindeki tüm bileşenler varsayılan olarak Sunucu Bileşenleridir. Bu, ekstra bir çalışma yapmadan bunları otomatik olarak benimsemenize ve hali hazırda mükemmel bir performans elde etmenize olanak tanır. İsteğe bağlı olarak 'use client' yönergesini kullanarak İstemci Bileşenleri de tercih edebilirsiniz.
+**Ölçeklenebilirlik:** Sunucu Bileşenleri, uygulamanız büyüdükçe JavaScript paketinin boyutunu artırmaz. Bu, uygulamanın ölçeklenebilirliğini artırır ve büyük uygulamaların yönetilmesini kolaylaştırır.
+
+Next.js ile, bir rota yüklendiğinde, ilk HTML sunucuda oluşturulur ve daha sonra tarayıcıda aşamalı olarak geliştirilir. Bu, uygulamanın hızlı bir şekilde yüklenmesini ve kullanıcı etkileşimine hızlı bir şekilde yanıt vermesini sağlar.
+
+Sunucu Bileşenlerine geçiş yapmak, Next.js'in Uygulama Yönlendiricisi sayesinde kolaydır. Uygulama Yönlendiricisi, tüm bileşenleri varsayılan olarak Sunucu Bileşenleri olarak işler, bu da onları otomatik olarak benimsemenizi ve hızlı bir şekilde performans kazanmanızı sağlar. İsteğe bağlı olarak, 'use client' yönergesini kullanarak İstemci Bileşenlerini de tercih edebilirsiniz.
 
 ## İstemci (Client) Bileşenleri
 
@@ -78,7 +80,7 @@ Sunucu Bileşenlerine geçişi kolaylaştırmak için, özel dosyalar ve ortak k
 
 ### "use client" yönergesi
 
-`"use client"` yönergesi, Sunucu ve İstemci Bileşen modül grafiği arasında bir sınır bildirmek için kullanılan bir kuraldır.
+`"use client"` yönergesi, Sunucu ve İstemci Bileşen modül grafiği arasında bir sınır belirlemek için kullanılır. Bu, kodun hangi kısmının sunucuda ve hangi kısmının istemci tarafında çalışacağını belirlememize yardımcı olur.
 
 ```typescript
 "use client";
@@ -128,9 +130,9 @@ Aşağıdaki tablo, Sunucu ve İstemci Bileşenleri için farklı kullanım duru
 
 ## İstemci Bileşenlerini Yapraklara Taşıma
 
-Uygulamanızın performansını artırmak için, İstemci Bileşenlerini mümkün olduğunca bileşen ağacınızın yapraklarına taşımanız önerilir.
+Uygulamanızın performansını optimize etmek için, İstemci Bileşenlerini mümkün olduğunca bileşen ağacınızın yapraklarına taşımanız önerilir. Bu, uygulamanızın genel JavaScript yükünü azaltır ve sayfa yükleme sürelerini hızlandırır.
 
-Örneğin, statik öğelere sahip bir Yerleşim (Layout) (ör. logo, linkler, vb.) ve durum kullanabilen etkileşimli bir arama çubuğunuz olabilir.
+Örneğin, statik öğelere sahip bir Yerleşim (Layout) bileşeniniz (örneğin logo, linkler vb.) ve durum kullanabilen etkileşimli bir arama çubuğunuz olabilir.
 
 Tüm düzeni bir İstemci Bileşeni yapmak yerine, etkileşimli mantığı bir İstemci Bileşenine (örneğin `<SearchBar />`) taşıyın ve düzeninizi bir Sunucu Bileşeni olarak tutun. Bu, düzenin tüm bileşen Javascript'ini istemciye göndermek zorunda olmadığınız anlamına gelir.
 
@@ -160,16 +162,16 @@ Sunucu ve İstemci Bileşenleri aynı bileşen ağacında birleştirilebilir.
 
 React, perde arkasında render işlemini aşağıdaki gibi gerçekleştirir:
 
-1. **Sunucuda React**, sonucu istemciye göndermeden önce tüm Sunucu Bileşenlerini işler.
+- **Sunucuda React**, sonucu istemciye göndermeden önce tüm Sunucu Bileşenlerini işler.
 
-- Buna İstemci Bileşenleri içinde yer alan Sunucu Bileşenleri de dahildir.
-- Bu aşamada karşılaşılan İstemci Bileşenleri atlanır.
+  - Buna İstemci Bileşenleri içinde yer alan Sunucu Bileşenleri de dahildir.
+  - Bu aşamada karşılaşılan İstemci Bileşenleri atlanır.
 
-2. **İstemcide**, React İstemci Bileşenlerini işler ve Sunucu Bileşenlerinin işlenmiş sonucundaki yuvaları, sunucuda ve istemcide yapılan işi birleştirir.
+- **İstemcide**, React İstemci Bileşenlerini işler ve Sunucu Bileşenlerinin işlenmiş sonucundaki yuvaları, sunucuda ve istemcide yapılan işi birleştirir.
 
-- Herhangi bir Sunucu Bileşeni bir İstemci Bileşeninin içine yerleştirilmişse, işlenen içerikler İstemci Bileşeninin içine doğru şekilde yerleştirilecektir.
+  - Herhangi bir Sunucu Bileşeni bir İstemci Bileşeninin içine yerleştirilmişse, işlenen içerikler İstemci Bileşeninin içine doğru şekilde yerleştirilecektir.
 
-Bilmekte fayda var:
+**Bilmekte fayda var:**
 
 Next.js'de, ilk sayfa yüklemesi sırasında, hem yukarıdaki adımdaki Sunucu Bileşenlerinin işlenmiş sonucu hem de İstemci Bileşenleri, daha hızlı bir ilk sayfa yüklemesi üretmek için sunucuda HTML olarak önceden işlenir.
 
@@ -179,13 +181,11 @@ Yukarıda özetlenen işleme akışı göz önüne alındığında, bir Sunucu B
 
 ### Desteklenmeyen Model: Sunucu Bileşenlerini İstemci Bileşenlerinin İçine Aktarma
 
-Aşağıdaki model desteklenmez. Bir Sunucu Bileşenini bir İstemci Bileşeninin içine aktaramazsınız:
+Aşağıdaki model desteklenmez. Bir Sunucu Bileşenini bir İstemci Bileşeninin içine **aktaramazsınız**:
 
 ```typescript
 "use client";
 
-// Bu düzen çalışmaz!!!!
-// Bir Sunucu Bileşenini bir İstemci Bileşeninin içine aktaramazsınız.
 import ExampleServerComponent from "./example-server-component";
 
 export default function ExampleClientComponent({
@@ -242,8 +242,6 @@ export default function ExampleClientComponent({
 Bir üst Sunucu Bileşeninde, hem `<ExampleClientComponent>` hem de `<ExampleServerComponent>` öğelerini içe aktarabilir ve `<ExampleServerComponent>` öğesini `<ExampleClientComponent>` öğesinin bir alt öğesi olarak geçirebilirsiniz:
 
 ```typescript
-// Bu düzen çalışır!!!!:
-// Bir Sunucu Bileşenini, bir İstemci Bileşeninin alt öğesi veya prop'u olarak iletebilirsiniz.
 import ExampleClientComponent from "./example-client-component";
 import ExampleServerComponent from "./example-server-component";
 
@@ -261,14 +259,14 @@ Bu yaklaşımla, `<ExampleClientComponent>` ve `<ExampleServerComponent>` öğel
 
 Bilmekte fayda var:
 
-1. Bu model, `children` prop ile [düzenlerde ve sayfalarda](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) zaten uygulanmaktadır, bu nedenle ek bir sarmalayıcı bileşen oluşturmanız gerekmez.
-2. React bileşenlerini (JSX) diğer bileşenlere aktarmak yeni bir kavram değildir ve her zaman React kompozisyon modelinin bir parçası olmuştur.
-3. Bu kompozisyon stratejisi, Sunucu ve İstemci Bileşenleri arasında çalışır çünkü prop'u alan bileşenin prop'un ne olduğu hakkında hiçbir bilgisi yoktur. Yalnızca kendisine aktarılan şeyin nereye yerleştirilmesi gerektiğinden sorumludur.
+- Bu model, `children` prop ile [düzenlerde ve sayfalarda](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) zaten uygulanmaktadır, bu nedenle ek bir sarmalayıcı bileşen oluşturmanız gerekmez.
+- React bileşenlerini (JSX) diğer bileşenlere aktarmak yeni bir kavram değildir ve her zaman React kompozisyon modelinin bir parçası olmuştur.
+- Bu kompozisyon stratejisi, Sunucu ve İstemci Bileşenleri arasında çalışır çünkü prop'u alan bileşenin prop'un ne olduğu hakkında hiçbir bilgisi yoktur. Yalnızca kendisine aktarılan şeyin nereye yerleştirilmesi gerektiğinden sorumludur.
 
-- Bu da aktarılan prop'un bağımsız olarak, bu durumda sunucuda, İstemci Bileşeni istemcide render edilmeden çok önce render edilmesini sağlar.
-- Aynı "içeriği yukarı kaldırma" stratejisi, içe aktarılan iç içe geçmiş bir alt bileşeni yeniden işleyen bir üst bileşendeki durum değişikliklerini önlemek için kullanılmıştır.
+  - Bu da aktarılan prop'un bağımsız olarak, bu durumda sunucuda, İstemci Bileşeni istemcide render edilmeden çok önce render edilmesini sağlar.
+  - Aynı "içeriği yukarı kaldırma" stratejisi, içe aktarılan iç içe geçmiş bir alt bileşeni yeniden işleyen bir üst bileşendeki durum değişikliklerini önlemek için kullanılmıştır.
 
-4. Sadece `children` prop ile sınırlı değilsiniz. JSX iletmek için herhangi bir prop kullanabilirsiniz.
+- Sadece `children` prop ile sınırlı değilsiniz. JSX iletmek için herhangi bir prop kullanabilirsiniz.
 
 ## Sunucudan İstemci Bileşenlerine Props iletimi (Serileştirme)
 
@@ -761,7 +759,7 @@ Rota segmentlerini genel erişime açmak için özel bir [`page.js` dosyası](#s
 
 Bu örnekte, `/dashboard/analytics` URL yolu, karşılık gelen bir `page.js` dosyasına sahip olmadığı için _genel erişime_ açık değildir. Bu klasör bileşenleri, stil sayfalarını, görüntüleri veya diğer ortak dosyaları depolamak için kullanılabilir.
 
-## Kullanıcı Arayüzü Oluşturma
+## Kullanıcı Arayüzü Oluşturma
 
 Her bir rota segmenti için kullanıcı arayüzü oluşturmak üzere [özel dosya kuralları](#dosya-kuralları) kullanılır. En yaygın olanları, bir rotaya özgü kullanıcı arayüzünü gösteren [sayfalar](#sayfalar) ve birden fazla rotada paylaşılan kullanıcı arayüzünü gösteren [düzenlerdir](#düzenler).
 
@@ -829,7 +827,7 @@ Bilmekte fayda var:
 - En üstteki düzen [Kök Düzen](#kök-düzeni-gerekli) olarak adlandırılır. Bu **gerekli** düzen, bir uygulamadaki tüm sayfalarda paylaşılır. Kök düzenler `html` ve `body` etiketlerini içermelidir.
 - Herhangi bir rota segmenti isteğe bağlı olarak kendi Düzenini tanımlayabilir. Bu düzenler o segmentteki tüm sayfalarda paylaşılır.
 - Bir rotadaki düzenler varsayılan olarak **iç içedir**. Her üst düzen, React `children` prop kullanarak altındaki alt düzenleri sarar.
-- Paylaşılan düzenlere belirli rota segmentlerini dahil etmek ve hariç tutmak için [Rota Gruplarını](#rota-grupları) kullanabilirsiniz.
+- Paylaşılan düzenlere belirli rota segmentlerini dahil etmek ve hariç tutmak için [Rota Gruplarını](#rota-grupları-route-groups) kullanabilirsiniz.
 - Düzenler varsayılan olarak Sunucu Bileşenleridir ancak İstemci Bileşeni olarak ayarlanabilir.
 - Düzenler veri getirebilir.
 - Bir üst düzen ile onun alt düzenleri arasında veri aktarımı mümkün değildir. Bununla birlikte, aynı verileri bir rotada birden fazla kez getirebilirsiniz ve React, performansı etkilemeden istekleri otomatik olarak çıkaracaktır.
@@ -860,7 +858,7 @@ Bilmekte fayda var:
 - `app` dizini **mutlaka** bir kök düzen içermelidir.
 - Next.js `<html>` ve `<body>` etiketlerini otomatik olarak oluşturmadığı için mutlaka kök düzen tanımlamalıdır.
 - `<head>` HTML öğelerini yönetmek için [yerleşik SEO desteğini](#metadata) kullanabilirsiniz, örneğin, `<title>` öğesi.
-- Birden fazla kök düzen oluşturmak için [rota gruplarını](#rota-grupları) kullanabilirsiniz.
+- Birden fazla kök düzen oluşturmak için [rota gruplarını](#rota-grupları-route-groups) kullanabilirsiniz.
 - Kök düzen varsayılan olarak bir [Sunucu Bileşenidir](#sunucu-server-bileşenleri) ve [İstemci Bileşeni](#i̇stemci-client-bileşenleri) olarak ayarlanamaz.
 
 ## İç içe Düzenler
@@ -885,7 +883,7 @@ Yukarıdaki iki düzeni birleştirecek olursanız, kök düzen (`app/layout.js`)
 
 <img alt="düzenler" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fnested-layouts-ui.png&w=3840&q=75&dpl=dpl_C2pSAYXZnY6DPcYmVfUv54azW3BJ" /><br/>
 
-[Rota Gruplarını](#rota-grupları), belirli rota segmentlerini paylaşılan düzenlere dahil etmek ve bu düzenlerden çıkarmak için kullanabilirsiniz.
+[Rota Gruplarını](#rota-grupları-route-groups), belirli rota segmentlerini paylaşılan düzenlere dahil etmek ve bu düzenlerden çıkarmak için kullanabilirsiniz.
 
 ## Şablonlar
 
@@ -938,6 +936,220 @@ export default function Page() {
 
 Bilmekte fayda var: Kök düzenlere `<title>` ve `<meta>` gibi `<head>` etiketlerini manuel olarak **eklememelisiniz**. Bunun yerine, `<head>` öğelerini akışa alma ve çoğaltma gibi gelişmiş gereksinimleri otomatik olarak ele alan Metadata API'sini kullanmalısınız.
 
+# Bağlama ve Gezinme (Linking and Navigating)
+
+Next.js yönlendiricisi, istemci tarafında gezinme ile sunucu merkezli yönlendirme kullanır. Anlık yükleme durumlarını ve eş zamanlı görüntülemeyi destekler.
+
+Rotalar arasında gezinmenin iki yolu vardır:
+
+- `<Link>` Bileşeni
+- `useRouter` Kancası
+
+## `<Link>` Bileşeni
+
+`<Link>`, rotalar arasında ön getirme ve istemci tarafında gezinme sağlamak için HTML `<a>` öğesini genişleten bir React bileşenidir. Next.js'de rotalar arasında gezinmenin birincil yoludur.
+
+`<Link>`'i kullanmak için next/link'ten içe aktarın ve bileşene bir href prop iletin:
+
+```tsx
+import Link from "next/link";
+
+export default function Page() {
+  return <Link href="/dashboard">Dashboard</Link>;
+}
+```
+
+## Örnekler
+
+### Dinamik Segmentlere Bağlantı
+
+Dinamik segmentlere bağlantı verirken, bir bağlantı listesi oluşturmak için [şablon değişmezlerini ve enterpolasyonu](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) kullanabilirsiniz. Örneğin, blog gönderilerinin bir listesini oluşturmak için:
+
+```tsx
+import Link from "next/link";
+
+export default function PostList({ posts }) {
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>
+          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Aktif Bağlantıları Kontrol Etme
+
+Bir bağlantının etkin olup olmadığını belirlemek için `usePathname()` işlevini kullanabilirsiniz. Örneğin, etkin bağlantıya bir sınıf eklemek için, geçerli yol adının bağlantının `href`'iyle eşleşip eşleşmediğini kontrol edebilirsiniz:
+
+```tsx
+"use client";
+
+import { usePathname } from "next/navigation";
+import { Link } from "next/link";
+
+export function Navigation({ navLinks }) {
+  const pathname = usePathname();
+
+  return (
+    <>
+      {navLinks.map((link) => {
+        const isActive = pathname.startsWith(link.href);
+
+        return (
+          <Link
+            className={isActive ? "text-blue" : "text-black"}
+            href={link.href}
+            key={link.name}
+          >
+            {link.name}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+```
+
+### Bir kimliğe kaydırma (Scrolling to an `id`)
+
+`<Link>`'in varsayılan davranışı, değişen rota segmentinin en üstüne kaydırmaktır. `href` içinde tanımlanmış bir `id` olduğunda, normal bir `<a>` etiketine benzer şekilde belirli id'ye kaydırılır.
+
+Rota segmentinin en üstüne kaydırmayı önlemek için `scroll={false}` olarak ayarlayın ve `href` öğesine karma bir `id` ekleyin:
+
+```tsx
+<Link href="/#hashid" scroll={false}>
+  Scroll to specific id.
+</Link>
+```
+
+## `useRouter()` Hook
+
+`useRouter` kancası, İstemci Bileşenleri içindeki rotaları programlı olarak değiştirmenize olanak tanır.
+
+`useRouter`'ı kullanmak için `next/navigation`'dan içe aktarın ve İstemci Bileşeninizin içindeki kancayı çağırın:
+
+```tsx
+"use client";
+
+import { useRouter } from "next/navigation";
+
+export default function Page() {
+  const router = useRouter();
+
+  return (
+    <button type="button" onClick={() => router.push("/dashboard")}>
+      Dashboard
+    </button>
+  );
+}
+```
+
+Öneri: `useRouter` kullanmak için özel bir gereksiniminiz olmadığı sürece rotalar arasında gezinmek için `<Link>` bileşenini kullanın.
+
+## Navigasyon Nasıl Çalışır?
+
+- `<Link>`kullanılarak veya `router.push()` çağrısı yapılarak bir rota geçişi başlatılır.
+- Yönlendirici, tarayıcının adres çubuğundaki URL'yi günceller.
+- Yönlendirici, istemci tarafı önbelleğindeki değişmeyen bölümleri (ör. paylaşılan düzenler) yeniden kullanarak gereksiz çalışmayı önler. Bu aynı zamanda kısmi işleme olarak da adlandırılır.
+- Yumuşak gezinme koşulları karşılanırsa, yönlendirici yeni segmenti sunucu yerine önbellekten alır. Değilse, yönlendirici sert bir gezinme gerçekleştirir ve Sunucu Bileşeni yükünü sunucudan alır.
+- Oluşturulursa, yük getirilirken sunucudan yükleme kullanıcı arayüzü gösterilir.
+- Yönlendirici, yeni segmentleri istemcide işlemek için önbelleğe alınan veya yeni yükü kullanır.
+
+### Oluşturulan Sunucu Bileşenlerinin İstemci Tarafında Önbelleğe Alınması
+
+Yeni yönlendirici, Sunucu Bileşenlerinin (yük) işlenmiş sonucunu depolayan bir bellek içi istemci tarafı önbelleğine sahiptir. Önbellek, herhangi bir düzeyde geçersiz kılmaya izin veren ve eşzamanlı render işlemlerinde tutarlılık sağlayan rota segmentlerine bölünmüştür.
+
+Kullanıcılar uygulamada gezinirken, yönlendirici daha önce getirilen segmentlerin ve önceden getirilen segmentlerin yükünü önbellekte depolayacaktır.
+
+Bu, belirli durumlarda yönlendiricinin sunucuya yeni bir istekte bulunmak yerine önbelleği yeniden kullanabileceği anlamına gelir. Bu, verilerin yeniden alınmasını ve bileşenlerin gereksiz yere yeniden oluşturulmasını önleyerek performansı artırır.
+
+### Önbelleğin Geçersiz Kılınması
+
+Sunucu Eylemleri, verileri yola (`revalidatePath`) veya önbellek etiketine (`revalidateTag`) göre isteğe bağlı olarak yeniden doğrulamak için kullanılabilir.
+
+### Prefetching
+
+Prefetching, bir rotayı ziyaret edilmeden önce arka planda önceden yüklemenin bir yoludur. Önceden yüklenen rotaların işlenmiş sonucu yönlendiricinin istemci tarafı önbelleğine eklenir. Bu, önceden yüklenmiş bir rotaya gitmeyi neredeyse anlık hale getirir.
+
+Varsayılan olarak, bileşeni kullanırken görünüm alanında görünür hale geldiklerinde rotalar önceden taranır. Bu, sayfa ilk yüklendiğinde veya kaydırma yoluyla gerçekleşebilir. Rotalar, `useRouter()` kancasının prefetch yöntemi kullanılarak programlı olarak da önceden alınabilir.
+
+#### Statik ve Dinamik Rotalar:
+
+- Rota statikse, rota segmentleri için tüm Sunucu Bileşeni yükleri önceden taranacaktır.
+- Rota dinamikse, ilk paylaşılan düzenden ilk `loading.js` dosyasına kadar olan yük önceden taranır. Bu, tüm rotayı dinamik olarak önceden getirmenin maliyetini azaltır ve dinamik rotalar için anlık yükleme durumlarına izin verir.
+
+### Yumuşak Navigasyon (Soft Navigation)
+
+Gezinme sırasında, değiştirilen segmentler için önbellek yeniden kullanılır (varsa) ve veri için sunucuya yeni bir istek yapılmaz.
+
+#### Yumuşak Navigasyon için Koşullar
+
+Navigasyonda Next.js, navigasyon yaptığınız rota önceden taranmışsa ve dinamik segmentler içermiyorsa ya da mevcut rota ile aynı dinamik parametrelere sahipse yumuşak navigasyon kullanacaktır.
+
+Örneğin, dinamik bir `[team]` segmenti içeren aşağıdaki rotayı düşünün: `/dashboard/[team]/*`. `dashboard/[team]/*` altındaki önbelleğe alınmış segmentler yalnızca `[team]` parametresi değiştiğinde geçersiz kılınacaktır.
+
+- `/dashboard/team-red/*` adresinden `/dashboard/team-red/*` adresine gitmek yumuşak bir navigasyon olacaktır.
+- `/dashboard/team-red/*` adresinden `/dashboard/team-blue/*` adresine gitmek zor bir navigasyon olacaktır.
+
+### Sert Navigasyon (Hard Navigation)
+
+Gezinme sırasında önbellek geçersiz kılınır ve sunucu verileri yeniden alır ve değiştirilen segmentleri yeniden işler.
+
+### Geri/İleri Navigasyon
+
+Geri ve ileri gezinme (popstate olayı) yumuşak bir gezinme davranışına sahiptir. Bu, istemci tarafı önbelleğinin yeniden kullanıldığı ve gezinmenin neredeyse anlık olduğu anlamına gelir.
+
+### Odaklanma ve Kaydırma Yönetimi
+
+Varsayılan olarak, Next.js odağı ayarlar ve gezinme sırasında değiştirilen segmenti görünüme kaydırır.
+
+# Rota Grupları (Route Groups)
+
+`app` dizininde, iç içe klasörler normalde URL yollarıyla eşlenir. Ancak, klasörün rotanın URL yoluna dahil edilmesini önlemek için bir klasörü Rota Grubu olarak işaretleyebilirsiniz.
+
+Bu özellik, URL yolu yapısını etkilemeden rota segmentlerinizi ve proje dosyalarınızı mantıksal gruplar halinde düzenlemenizi sağlar. Bu, kodunuzun okunabilirliğini ve bakımını kolaylaştırır.
+
+Rota grupları, aşağıdaki durumlar için özellikle kullanışlıdır:
+
+- Rotaları gruplar halinde düzenleme: Bu, site bölümüne, amaca veya ekibe göre rotaları gruplamayı kolaylaştırır.
+- Aynı rota segmenti düzeyinde iç içe düzenleri etkinleştirme: Bu, aynı segmentte birden fazla iç içe düzen oluşturmayı ve ortak bir segmentteki rotaların alt kümesine bir düzen eklemeyi mümkün kılar.
+
+Bir klasörün adı parantez içine alınarak bir rota grubu oluşturulabilir: `(folderName)`
+
+## Örnekler
+
+### URL yolunu etkilemeden rotaları düzenleme
+
+URL'yi etkilemeden rotaları düzenlemek için, ilgili rotaları bir arada tutmak üzere bir grup oluşturun. Parantez içindeki klasörler URL'den çıkarılacaktır (örneğin `(marketing)` veya `(shop)`).
+
+<img alt="rota grupları" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Froute-group-organisation.png&w=3840&q=75&dpl=dpl_4MG439i8vBzxyfi2msZH7XDinQ5W" /><br/>
+
+`(marketing)` ve `(shop)` içindeki rotalar aynı URL hiyerarşisini paylaşsa da, klasörlerinin içine bir `layout.js` dosyası ekleyerek her grup için farklı bir düzen oluşturabilirsiniz.
+
+<img alt="rota grupları" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Froute-group-multiple-layouts.png&w=3840&q=75&dpl=dpl_4MG439i8vBzxyfi2msZH7XDinQ5W" /><br/>
+
+### Belirli segmentleri bir düzene dahil etme
+
+Belirli rotaları bir düzene dahil etmek için yeni bir rota grubu oluşturun (örn. `(shop)`) ve aynı düzeni paylaşan rotaları gruba taşıyın (örn. `account` ve `cart`). Grubun dışındaki rotalar düzeni paylaşmayacaktır (örn. `checkout`).
+
+<img alt="rota grupları" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Froute-group-opt-in-layouts.png&w=3840&q=75&dpl=dpl_4MG439i8vBzxyfi2msZH7XDinQ5W" /><br/>
+
+### Çoklu kök düzenleri oluşturma
+
+Birden fazla kök düzen oluşturmak için üst düzey `layout.js` dosyasını kaldırın ve her rota grubunun içine bir `layout.js` dosyası ekleyin. Bu, bir uygulamayı tamamen farklı bir kullanıcı arayüzüne veya deneyime sahip bölümlere ayırmak için kullanışlıdır. `<html>` ve `<body>` etiketlerinin her bir kök düzene eklenmesi gerekir.
+
+<img alt="rota grupları" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Froute-group-multiple-root-layouts.png&w=3840&q=75&dpl=dpl_4MG439i8vBzxyfi2msZH7XDinQ5W" /><br/>
+
+Bilmekte fayda var:
+
+- Rota gruplarının adlandırılması, organizasyon dışında özel bir öneme sahip değildir ve URL yolu üzerinde hiçbir etkisi yoktur.
+- Bir rota grubu içeren rotalar, diğer rotalarla aynı URL yoluna çözümlenmemelidir. Yani, `(marketing)/about/page.js` ve `(shop)/about/page.js` rotaları her ikisi de `/about` olarak çözümlenir ve bu bir hataya neden olur.
+- Eğer birden fazla kök düzeniniz varsa ve üst düzey bir `layout.js` dosyanız yoksa, ana `page.js` dosyanız rota gruplarından birinde tanımlanmalıdır. Örneğin: `app/(marketing)/page.js.`
+- Birden fazla kök düzen arasında gezinmek tam sayfa yüklemesine neden olacaktır. Yani, `app/(shop)/layout.js` kullanan `/cart` sayfasından `app/(marketing)/layout.js` kullanan `/blog` sayfasına gitmek tam sayfa yüklemeye neden olur. Bu durum, yalnızca birden fazla kök düzen için geçerlidir ve istemci tarafı gezinmenin aksine çalışır.
+
 ## Metadata
 
-## Rota Grupları
