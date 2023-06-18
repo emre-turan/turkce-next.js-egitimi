@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="logo" src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg" width="224px"/>
+  <img alt="logo" src="https://www.rlogical.com/wp-content/uploads/2023/03/Rlogical-Blog-Images-thumbnail.webp" width="224px"/>
 <br>
 
 Türkçe Next.js Eğitimi (App Router - Uygulama Yönlendiricisi)
@@ -10,7 +10,7 @@ Bu repo, Next.js'in büyülü dünyasına adım atmak isteyenler için özenle h
 
 Bu eğitim serisi, Next.js'i öğrenmek ve ustalaşmak isteyenlere, adım adım bir rehber sunmayı amaçlar. Her bir konu, detaylı ve anlaşılır bir şekilde ele alınmıştır, böylece okuyucuların Next.js'i etkin ve hızlı bir şekilde öğrenmeleri hedeflenir.
 
-<!-- Bu eğitim serisini aynı zamanda (gitbook linki) web sitesinden de takip edebilirsiniz. -->
+Bu eğitim serisini aynı zamanda [gitbook](https://emres-organization-4.gitbook.io/next.js-doekuemani/) web sitesinden de takip edebilirsiniz.
 
 Eğer bu rehberi faydalı bulursanız ve daha fazla kişiye ulaşmasını isterseniz, repoya yıldız atabilir ve sosyal medya hesaplarınızda paylaşabilirsiniz. Her bir yıldız, bu eğitim serisinin daha fazla kişiye ulaşmasına yardımcı olur ⭐️
 
