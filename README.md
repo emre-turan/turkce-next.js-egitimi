@@ -1180,7 +1180,8 @@ export default function Page({ params }: { params: { slug: string } }) {
 ```
 
 | Route                               | `Params` Type Definition                 |
-| ----------------------------------- | ---------------------------------------- | ------------ |
-| `app/blog/[slug]/page.js`           | `{ slug: string }`                       | slug: string |
+| ----------------------------------- | ---------------------------------------- |
+| `app/blog/[slug]/page.js`           | `{ slug: string }`                       |
 | `app/shop/[...slug]/page.js`        | `{ slug: string[] }`                     |
 | `app/[categoryId]/[itemId]/page.js` | `{ categoryId: string, itemId: string }` |
+
