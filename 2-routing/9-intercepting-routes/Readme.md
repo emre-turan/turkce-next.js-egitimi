@@ -10,7 +10,7 @@ Ancak, örneğin paylaşılabilir bir URL'ye tıklayarak veya sayfayı yenileyer
 
 <img alt="kesen-rotalar-2" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fintercepting-routes-hard-navigate.png&w=3840&q=75&dpl=dpl_8fzWiojXNexXAYQSWwEEmzPxZwZN" /><br/>
 
-Uygulama Biçimi
+## Convention
 
 Kesişen rotalar, göreli yol kuralı `../`'ye benzeyen ancak segmentler için olan `(..)` kuralı ile tanımlanabilir.
 
