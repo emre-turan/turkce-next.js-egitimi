@@ -2063,3 +2063,524 @@ export const fetchCache = "auto";
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
 ```
+
+# Ara Yazılım (Middleware)
+
+Ara yazılım, bir istek tamamlanmadan önce kod çalıştırmanıza olanak tanır. Ardından, gelen isteğe bağlı olarak, yeniden yazarak, yönlendirerek, istek veya yanıt başlıklarını değiştirerek veya doğrudan yanıt vererek yanıtı değiştirebilirsiniz.
+
+Ara yazılım, önbelleğe alınan içerik ve yollar eşleştirilmeden önce çalışır.
+
+## Convention
+
+Middleware'i tanımlamak için projenizin kök dizinindeki `middleware.ts` (veya `.js`) dosyasını kullanın. Örneğin, `pages` veya `app` ile aynı seviyede veya varsa `src` içinde.
+
+```ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+// İçinde `await` kullanılıyorsa bu işlev `async` olarak işaretlenebilir
+export function middleware(request: NextRequest) {
+  return NextResponse.redirect(new URL("/home", request.url));
+}
+
+// See "Matching Paths" below to learn more
+export const config = {
+  matcher: "/about/:path*",
+};
+```
+
+## Eşleşen Yollar (Matching Paths)
+
+Ara yazılım, projenizdeki **her rota için** çağrılacaktır. Çalıştırma sırası aşağıdaki gibidir:
+
+1. `next.config.js`'den `headers`
+2. `next.config.js`'den `redirects`
+3. Ara yazılım (`rewrites`, `redirects`, vb.)
+4. `next.config.js` dosyasından `beforeFiles` (`rewrites`)
+5. Dosya sistemi rotaları (`public/`, `_next/static/`, `pages/`, `app/`, vb.)
+6. `next.config.js` dosyasından `afterFiles` (`rewrites`)
+7. Dinamik Rotalar (`/blog/[slug]`)
+8. `next.config.js`'den `fallback` (`rewrites`)
+
+## Eşleştirici (Matcher)
+
+`matcher`, Orta Yazılımı (middleware) belirli yollarda çalışacak şekilde filtrelemenize olanak tanır.
+
+```ts
+export const config = {
+  matcher: "/about/:path*",
+};
+```
+
+Bir dizi sözdizimiyle tek bir yolu veya birden fazla yolu eşleştirebilirsiniz:
+
+```ts
+export const config = {
+  matcher: ["/about/:path*", "/dashboard/:path*"],
+};
+```
+
+`matcher` yapılandırması tam regex'e izin verir, böylece negatif lookahead'ler veya karakter eşleştirme gibi eşleştirmeler desteklenir. Belirli yollar hariç tümünü eşleştirmek için negatif lookahead örneği burada görülebilir:
+
+```ts
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API yolları)
+     * - _next/static (static dosyalar)
+     * - _next/image (görüntü optimizasyon dosyaları)
+     * - favicon.ico (favicon dosyası)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
+};
+```
+
+Bilmekte fayda var: `matcher` değerlerinin sabit olması gerekir, böylece derleme zamanında statik olarak analiz edilebilirler. Değişkenler gibi dinamik değerler göz ardı edilecektir.
+
+### Yapılandırılmış eşleştiriciler:
+
+1. ile başlamalıdır `/`
+2. Adlandırılmış parametreler içerebilir: `/about/:path`, `/about/a` ve `/about/b` ile eşleşir ancak `/about/a/c` ile eşleşmez
+3. Adlandırılmış parametreler üzerinde değiştiricilere sahip olabilir (`:` ile başlayan): `/about/:path*` `/about/a/b/c` ile eşleşir çünkü `*` sıfır veya daha fazladır. `?` sıfır veya bir ve `+` bir veya daha fazla
+4. Parantez içine alınmış düzenli ifade kullanabilir: `/about/(.x)`, `/about/:pathx` ile aynıdır
+
+[Path-to-regexp](https://github.com/pillarjs/path-to-regexp#path-to-regexp-1) belgeleri hakkında daha fazla bilgi edinin.
+
+Bilmekte fayda var: Geriye dönük uyumluluk için Next.js her zaman `/public` öğesini `/public/index` olarak kabul eder. Bu nedenle, `/public/:path` eşleştiricisi eşleşecektir.
+
+### Koşullu İfadeler (Conditional Statements)
+
+```ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/about")) {
+    return NextResponse.rewrite(new URL("/about-2", request.url));
+  }
+
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.rewrite(new URL("/dashboard/user", request.url));
+  }
+}
+```
+
+## NextResponse
+
+`NextResponse` API şunları yapmanıza olanak tanır:
+
+- gelen isteği farklı bir URL'ye yönlendirir.
+- belirli bir URL'yi görüntüleyerek yanıtı yeniden yazın
+- API Routes, `getServerSideProps` ve `rewrite` hedefleri için istek üstbilgilerini ayarlama
+- Yanıt çerezlerini ayarlama
+- Yanıt başlıklarını ayarlama
+
+Middleware'den bir yanıt üretmek için şunları yapabilirsiniz:
+
+1. Yanıt üreten bir rotaya (Sayfa veya Edge API Rotası) yeniden yazma
+2. Doğrudan bir NextResponse döndürür.
+
+## Çerez Kullanımı (Using Cookies)
+
+Çerezler normal başlıklardır. Bir İstekte, `Cookie` başlığında saklanırlar. Yanıtta ise `Set-Cookie` başlığında bulunurlar. Next.js, `NextRequest` ve `NextResponse` üzerindeki `cookies` uzantısı aracılığıyla bu çerezlere erişmek ve bunları değiştirmek için uygun bir yol sağlar.
+
+1. Gelen istekler için çerezler şu yöntemlerle birlikte gelir: `get`, `getAll`, `set` ve `delete` çerezleri. `has` ile bir çerezin varlığını kontrol edebilir veya `clear` ile tüm çerezleri kaldırabilirsiniz.
+2. Giden yanıtlar için, çerezler aşağıdaki `get`, `getAll`, `set` ve `delete` yöntemlerine sahiptir.
+
+```ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  // Gelen istekte bir "Cookie:nextjs=fast" başlığının bulunduğunu varsayın
+  // RequestCookies` API'sini kullanarak istekten çerezleri alma
+  let cookie = request.cookies.get("nextjs");
+  console.log(cookie); // => { name: 'nextjs', value: 'fast', Path: '/' }
+  const allCookies = request.cookies.getAll();
+  console.log(allCookies); // => [{ name: 'nextjs', value: 'fast' }]
+
+  request.cookies.has("nextjs"); // => true
+  request.cookies.delete("nextjs");
+  request.cookies.has("nextjs"); // => false
+
+  // ResponseCookies` API'sini kullanarak yanıt üzerinde çerezleri ayarlama
+  const response = NextResponse.next();
+  response.cookies.set("vercel", "fast");
+  response.cookies.set({
+    name: "vercel",
+    value: "fast",
+    path: "/",
+  });
+  cookie = response.cookies.get("vercel");
+  console.log(cookie); // => { name: 'vercel', value: 'fast', Path: '/' }
+  // Giden yanıt bir `Set-Cookie:vercel=fast;path=/test` başlığına sahip olacaktır.
+
+  return response;
+}
+```
+
+## Üstbilgileri Ayarlama (Setting Headers)
+
+`NextResponse` API'sini kullanarak istek ve yanıt başlıklarını ayarlayabilirsiniz (istek başlıklarının ayarlanması Next.js v13.0.0'dan beri mevcuttur).
+
+```ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  // İstek başlıklarını klonlayın ve yeni bir `x-hello-from-middleware1` başlığı ayarlayın
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-hello-from-middleware1", "hello");
+
+  // İstek başlıklarını NextResponse.rewrite içinde de ayarlayabilirsiniz
+  const response = NextResponse.next({
+    request: {
+      // Yeni istek başlıkları
+      headers: requestHeaders,
+    },
+  });
+
+  // Yeni bir `x-hello-from-middleware2` yanıt başlığı ayarlayın
+  response.headers.set("x-hello-from-middleware2", "hello");
+  return response;
+}
+```
+
+Bilmekte fayda var: Arka uç web sunucusu yapılandırmanıza bağlı olarak [431 Request Header Fields Too Large](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/431) hatasına neden olabileceğinden büyük başlıklar ayarlamaktan kaçının.
+
+## Yanıt Üretme (Producing a Response)
+
+Bir `Response` veya `NextResponse` örneği döndürerek Middleware'den doğrudan yanıt verebilirsiniz. (Bu Next.js v13.1.0'dan beri mevcuttur)
+
+```ts
+import { NextRequest, NextResponse } from "next/server";
+import { isAuthenticated } from "@lib/auth";
+
+// Ara yazılımı `/api/` ile başlayan yollarla sınırlayın
+export const config = {
+  matcher: "/api/:function*",
+};
+
+export function middleware(request: NextRequest) {
+  // İsteği kontrol etmek için kimlik doğrulama işlevimizi çağırın
+  if (!isAuthenticated(request)) {
+    // Bir hata mesajı belirten JSON ile yanıt verin
+    return new NextResponse(
+      JSON.stringify({ success: false, message: "authentication failed" }),
+      { status: 401, headers: { "content-type": "application/json" } }
+    );
+  }
+}
+```
+
+## Gelişmiş Orta Yazılım Bayrakları (Advanced Middleware Flags)
+
+Next.js'nin `v13.1` sürümünde, gelişmiş kullanım durumlarını ele almak için ara katman için `skipMiddlewareUrlNormalize` ve `skipTrailingSlashRedirect` olmak üzere iki ek bayrak tanıtıldı.
+
+`skipTrailingSlashRedirect`, sondaki eğik çizgilerin eklenmesi veya kaldırılması için Next.js varsayılan yönlendirmelerinin devre dışı bırakılmasına olanak tanıyarak, bazı yollar için sondaki eğik çizginin korunmasına izin verebilen ancak diğerleri için izin vermeyen ara yazılım içinde özel işleme izin verir.
+
+```ts
+module.exports = {
+  skipTrailingSlashRedirect: true,
+};
+```
+
+```ts
+const legacyPrefixes = ["/docs", "/blog"];
+
+export default async function middleware(req) {
+  const { pathname } = req.nextUrl;
+
+  if (legacyPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+    return NextResponse.next();
+  }
+
+  // apply trailing slash handling
+  if (
+    !pathname.endsWith("/") &&
+    !pathname.match(/((?!\.well-known(?:\/.*)?)(?:[^/]+\/)*[^/]+\.\w+)/)
+  ) {
+    req.nextUrl.pathname += "/";
+    return NextResponse.redirect(req.nextUrl);
+  }
+}
+```
+
+`skipMiddlewareUrlNormalize`, Next.js'nin doğrudan ziyaretleri ve istemci geçişlerini aynı şekilde ele almak için yaptığı URL normalleştirmesini devre dışı bırakmaya olanak tanır. Bunun kilidini açtığı orijinal URL'yi kullanarak tam kontrole ihtiyaç duyduğunuz bazı gelişmiş durumlar vardır.
+
+```ts
+module.exports = {
+  skipMiddlewareUrlNormalize: true,
+};
+```
+
+```ts
+export default async function middleware(req) {
+  const { pathname } = req.nextUrl;
+
+  // GET /_next/data/build-id/hello.json
+
+  console.log(pathname);
+  // bu bayrak ile /_next/data/build-id/hello.json
+  //bayrak olmadan bu /hello olarak normalleştirilirdi
+}
+```
+
+# Proje Organizasyonu ve Dosya Kolokasyonu (Project Organization and File Colocation)
+
+Yönlendirme klasörü ve dosya kurallarının yanı sıra Next.js, proje dosyalarınızı nasıl düzenlediğiniz ve konumlandırdığınız konusunda görüş bildirmez.
+
+## Varsayılan olarak güvenli ortak yerleşim (Safe colocation by default)
+
+`app` dizininde, iç içe klasör hiyerarşisi rota yapısını tanımlar.
+
+Her klasör, URL yolunda karşılık gelen bir segmentle eşlenen bir rota segmentini temsil eder.
+
+Ancak, rota yapısı klasörler aracılığıyla tanımlansa da, bir rota segmentine bir `page.js` veya `route.js` dosyası eklenene kadar bir rota genel olarak erişilebilir değildir.
+
+<img alt="proje-organizasyonu" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-not-routable.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+Ve bir rota genel erişime açık hale getirildiğinde bile, istemciye yalnızca `page.js` veya `route.js` tarafından döndürülen içerik gönderilir.
+
+<img alt="proje-organizasyonu-2" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-routable.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+Bu, proje dosyalarının yanlışlıkla yönlendirilebilir olmadan `app` dizinindeki rota segmentlerinin içine güvenli bir şekilde yerleştirilebileceği anlamına gelir.
+
+<img alt="proje-organizasyonu-3" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-colocation.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+Bilmekte fayda var:
+
+- Bu, sayfalardaki herhangi bir dosyanın bir rota olarak kabul edildiği `pages` dizininden farklıdır.
+- Proje dosyalarınızı `app` dizinine yerleştirebilirsiniz ancak bunu yapmak zorunda değilsiniz. Tercih ederseniz, bunları `app` dizininin dışında tutabilirsiniz.
+
+## Proje organizasyon özellikleri (Project organization features)
+
+Next.js, projenizi düzenlemenize yardımcı olacak çeşitli özellikler sunar.
+
+### Özel Klasörler
+
+Özel klasörler, bir klasörün önüne alt çizgi getirilerek oluşturulabilir: `_folderName`
+
+Bu, klasörün özel bir uygulama ayrıntısı olduğunu ve yönlendirme sistemi tarafından dikkate alınmaması gerektiğini gösterir, böylece klasör ve tüm alt klasörleri yönlendirme dışında bırakılır.
+
+<img alt="proje-organizasyonu-4" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-private-folders.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+`app` dizinindeki dosyalar varsayılan olarak güvenli bir şekilde ortak konumlandırılabildiğinden, özel klasörler ortak konumlandırma için gerekli değildir. Ancak, şunlar için yararlı olabilirler:
+
+- UI mantığını yönlendirme mantığından ayırma.
+- Dahili dosyaları bir proje ve Next.js ekosistemi genelinde tutarlı bir şekilde düzenleme.
+- Kod düzenleyicilerde dosyaları sıralama ve gruplama.
+- Gelecekteki Next.js dosya kurallarıyla olası adlandırma çakışmalarını önleme.
+
+Bilmekte fayda var:
+
+- Bir çatı kuralı olmamakla birlikte, özel klasörlerin dışındaki dosyaları da aynı alt çizgi kalıbını kullanarak "private" olarak işaretlemeyi düşünebilirsiniz.
+- Klasör adının önüne `%5F` (alt çizginin URL ile kodlanmış biçimi) ekleyerek alt çizgi ile başlayan URL segmentleri oluşturabilirsiniz: `%5FfolderName`.
+- Özel klasörler kullanmıyorsanız, beklenmedik adlandırma çakışmalarını önlemek için Next.js özel dosya kurallarını bilmek yararlı olacaktır.
+
+## Rota Grupları (Route Groups)
+
+Rota grupları bir klasör parantez içine alınarak oluşturulabilir: `(folderName)`
+
+Bu, klasörün organizasyonel amaçlar için olduğunu ve rotanın URL yoluna dahil edilmemesi gerektiğini gösterir.
+
+<img alt="proje-organizasyonu-5" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-route-groups.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+Rota grupları şunlar için kullanışlıdır:
+
+- Rotaları gruplar halinde düzenleme, örneğin site bölümüne, amaca veya ekibe göre.
+- Aynı rota segmenti düzeyinde iç içe düzenleri etkinleştirme:
+  - Birden fazla kök düzen dahil olmak üzere aynı segmentte birden fazla iç içe düzen oluşturma
+  - Ortak bir segmentteki rotaların alt kümesine bir düzen ekleme
+
+## `src` Dizini
+
+Next.js, uygulama kodunun (`app` dahil) isteğe bağlı bir `src` dizini içinde saklanmasını destekler. Bu, uygulama kodunu çoğunlukla bir projenin kök dizininde bulunan proje yapılandırma dosyalarından ayırır.
+
+<img alt="proje-organizasyonu-6" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-src-directory.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+## Modül Yolu Takma Adları (Module Path Aliases)
+
+Next.js, derinlemesine iç içe geçmiş proje dosyalarında içe aktarmaları okumayı ve sürdürmeyi kolaylaştıran Modül Yolu Takma Adlarını destekler.
+
+```ts
+// önce
+import { Button } from "../../../components/button";
+
+// sonra
+import { Button } from "@/components/button";
+```
+
+## Proje organizasyon stratejileri (Project organization strategies)
+
+Bir Next.js projesinde kendi dosyalarınızı ve klasörlerinizi düzenlemek söz konusu olduğunda "doğru" veya "yanlış" bir yol yoktur.
+
+Aşağıdaki bölüm, yaygın stratejilerin çok üst düzey bir özetini listelemektedir. En basit çıkarım, sizin ve ekibiniz için işe yarayan bir strateji seçmek ve proje genelinde tutarlı olmaktır.
+
+Bilmekte fayda var: Aşağıdaki örneklerimizde, `components` ve `lib` klasörlerini genelleştirilmiş yer tutucular olarak kullanıyoruz, bunların adlandırılmasının özel bir çerçeve önemi yoktur ve projeleriniz `ui`, `utils`, `hooks`, `styles` vb. gibi başka klasörler kullanabilir.
+
+### Proje dosyalarını `app` dışında saklama
+
+Bu strateji, tüm uygulama kodunu projenizin kök dizinindeki paylaşılan klasörlerde saklar ve `app` dizinini yalnızca yönlendirme amacıyla tutar.
+
+<img alt="proje-organizasyonu-7" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-project-root.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+### Proje dosyalarını `app` içindeki üst düzey klasörlerde saklayın
+
+Bu strateji, tüm uygulama kodunu `app` dizininin kök dizinindeki paylaşılan klasörlerde saklar.
+
+<img alt="proje-organizasyonu-8" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-app-root.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9" /><br/>
+
+### Proje dosyalarını özellik veya rotaya göre bölme
+
+Bu strateji, genel olarak paylaşılan uygulama kodunu kök `app` dizininde depolar ve daha spesifik uygulama kodunu bunları kullanan rota segmentlerine böler.
+
+<img alt="proje-organizasyonu-9" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-app-root-split.png&w=3840&q=75&dpl=dpl_GhJPXqxoPPM8iCyYvCDRicbiTqZ9"/><br/>
+
+# Uluslararasılaştırma (Internationalization)
+
+Next.js, birden fazla dili desteklemek için içeriğin yönlendirilmesini ve oluşturulmasını yapılandırmanıza olanak tanır. Sitenizi farklı yerel ayarlara uyumlu hale getirmek, çevrilmiş içerik (yerelleştirme) ve uluslararasılaştırılmış rotaları içerir.
+
+## Terminoloji
+
+- Yerel ayar: Bir dizi dil ve biçimlendirme tercihi için bir tanımlayıcı. Bu genellikle kullanıcının tercih ettiği dili ve muhtemelen coğrafi bölgesini içerir.
+  - `en-US`: Amerika Birleşik Devletleri'nde konuşulan İngilizce
+  - `nl-NL`: Hollanda'da konuşulduğu şekliyle Hollandaca
+  - `nl`: Hollandaca, belirli bir bölge yok
+
+## Yönlendirmeye Genel Bakış (Routing Overview)
+
+Hangi yerel ayarın kullanılacağını seçmek için kullanıcının tarayıcıdaki dil tercihlerini kullanmanız önerilir. Tercih ettiğiniz dili değiştirmek, uygulamanıza gelen `Accept-Language` başlığını değiştirecektir.
+
+Örneğin, aşağıdaki kütüphaneleri kullanarak, Üstbilgilere, desteklemeyi planladığınız yerel ayarlara ve varsayılan yerel ayara göre hangi yerel ayarı seçeceğinizi belirlemek için gelen bir İsteğe bakabilirsiniz.
+
+```ts
+import { match } from "@formatjs/intl-localematcher";
+import Negotiator from "negotiator";
+
+let headers = { "accept-language": "en-US,en;q=0.5" };
+let languages = new Negotiator({ headers }).languages();
+let locales = ["en-US", "nl-NL", "nl"];
+let defaultLocale = "en-US";
+
+match(languages, locales, defaultLocale); // -> 'en-US'
+```
+
+Yönlendirme, alt yol (`/fr/products`) veya etki alanı (`my-site.fr/products`) ile uluslararasılaştırılabilir. Bu bilgilerle artık kullanıcıyı Middleware içindeki yerel ayara göre yönlendirebilirsiniz.
+
+```ts
+import { NextResponse } from 'next/server'
+
+let locales = ['en-US', 'nl-NL', 'nl']
+
+// Yukarıdakine benzer şekilde veya bir kütüphane kullanarak tercih edilen yerel ayarı alın
+function getLocale(request) { ... }
+
+export function middleware(request) {
+  // Yol adında desteklenen herhangi bir yerel ayar olup olmadığını kontrol edin
+  const pathname = request.nextUrl.pathname
+  const pathnameIsMissingLocale = locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  )
+
+  // Yerel ayar yoksa yönlendirme
+  if (pathnameIsMissingLocale) {
+    const locale = getLocale(request)
+
+    // örneğin gelen istek /products
+    // Yeni URL artık /en-US/products şeklindedir
+    return NextResponse.redirect(
+      new URL(`/${locale}/${pathname}`, request.url)
+    )
+  }
+}
+
+export const config = {
+  matcher: [
+    // Tüm dahili yolları atla (_next)
+    '/((?!_next).*)',
+    // İsteğe bağlı: yalnızca kök (/) URL'de çalıştır
+    // '/'
+  ],
+}
+```
+
+Son olarak, `app/` içindeki tüm özel dosyaların `app/[lang]` altında yuvalandığından emin olun. Bu, Next.js yönlendiricisinin rotadaki farklı yerel ayarları dinamik olarak işlemesini ve `lang` parametresini her düzene ve sayfaya iletmesini sağlar. Örneğin:
+
+```ts
+// Artık geçerli yerel ayara erişiminiz var
+// örneğin /en-US/products -> `lang` "en-US "dir
+export default async function Page({ params: { lang } }) {
+  return ...
+}
+```
+
+Kök düzen de yeni klasörün içine yerleştirilebilir (örn. `app/[lang]/layout.js`).
+
+## Yerelleştirme (Localization)
+
+Görüntülenen içeriğin kullanıcının tercih ettiği yerel ayara veya yerelleştirmeye göre değiştirilmesi Next.js'ye özgü bir şey değildir. Aşağıda açıklanan modeller herhangi bir web uygulamasında aynı şekilde çalışacaktır.
+
+Uygulamamız içinde hem İngilizce hem de Hollandaca içeriği desteklemek istediğimizi varsayalım. Bize bazı anahtarlardan yerelleştirilmiş bir dizeye eşleme sağlayan nesneler olan iki farklı "sözlük" tutabiliriz. Örneğin:
+
+```ts
+{
+  "products": {
+    "cart": "Add to Cart"
+  }
+}
+```
+
+```ts
+{
+  "products": {
+    "cart": "Voeg toe aan winkelwagen"
+  }
+}
+```
+
+Ardından, istenen yerel ayar için çevirileri yüklemek üzere bir `getDictionary` işlevi oluşturabiliriz:
+
+```ts
+import "server-only";
+
+const dictionaries = {
+  en: () => import("./dictionaries/en.json").then((module) => module.default),
+  nl: () => import("./dictionaries/nl.json").then((module) => module.default),
+};
+
+export const getDictionary = async (locale) => dictionaries[locale]();
+```
+
+O anda seçili olan dil göz önüne alındığında, bir düzen veya sayfanın içindeki sözlüğü getirebiliriz.
+
+```ts
+import { getDictionary } from "./dictionaries";
+
+export default async function Page({ params: { lang } }) {
+  const dict = await getDictionary(lang); // en
+  return <button>{dict.products.cart}</button>; // Add to Cart
+}
+```
+
+`app/` dizinindeki tüm düzenler ve sayfalar varsayılan olarak Sunucu Bileşenleri olduğundan, çeviri dosyalarının boyutunun istemci tarafı JavaScript paket boyutumuzu etkilemesi konusunda endişelenmemize gerek yoktur. Bu kod yalnızca sunucuda çalışacak ve tarayıcıya yalnızca ortaya çıkan HTML gönderilecektir.
+
+## Statik Üretim (Static Generation)
+
+Belirli bir yerel ayar kümesi için statik rotalar oluşturmak üzere `generateStaticParams`'ı herhangi bir sayfa veya düzenle birlikte kullanabiliriz. Bu, örneğin kök düzeninde global olabilir:
+
+```ts
+export async function generateStaticParams() {
+  return [{ lang: "en-US" }, { lang: "de" }];
+}
+
+export default function Root({ children, params }) {
+  return (
+    <html lang={params.lang}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
