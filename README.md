@@ -38,8 +38,9 @@ Next.js'in bazı temel özellikleri şunlardır:
 
 # İçerik:
 
-- [React Essentials](#reactın-temelleri-react-essentials)
-- [Routing Fundamentals](#yönlendirme-temelleri-routing-fundamentals)
+- [React'ın Temelleri (React Essentials) ](#reactın-temelleri-react-essentials)
+- [Yönlendirme Temelleri (Routing Fundamentals)](#yönlendirme-temelleri-routing-fundamentals)
+- [Render Etme (Rendering) ](#render-etme-rendering)
 
 # React'ın Temelleri (React Essentials)
 
@@ -2584,6 +2585,7 @@ export default function Root({ children, params }) {
   );
 }
 ```
+
 # Render Etme (Rendering)
 
 Render etme, yazdığınız kodu kullanıcı arayüzlerine dönüştürür.
