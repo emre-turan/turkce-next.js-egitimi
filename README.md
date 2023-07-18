@@ -43,6 +43,7 @@ Next.js'in bazı temel özellikleri şunlardır:
 - [Render Etme (Rendering) ](#render-etme-rendering)
 - [Veri Getirme (Data Fetching)](#veri-getirme-data-fetching)
 - [Şekillendirme (Styling)](#şekillendirme-styling)
+- [Optimizasyonlar (Optimizations)](#optimizasyonlar-optimizations)
 
 # React'ın Temelleri (React Essentials)
 
@@ -4073,3 +4074,95 @@ export default function RootLayout({
 - Sunucu render etme sırasında, stiller global bir kayıt defterine çıkarılır ve HTML'nizin `<head>` bölümüne aktarılır. Bu, stil kurallarının onları kullanabilecek tüm içeriklerden önce yerleştirilmesini sağlar. Gelecekte, stilleri nereye enjekte edeceğimizi belirlemek için yakında çıkacak bir React özelliğini kullanabiliriz.
 - Akış sırasında, her bir yığından gelen stiller toplanacak ve mevcut stillere eklenecektir. İstemci tarafı hidrasyon tamamlandıktan sonra, `styled-components` her zamanki gibi devralacak ve başka dinamik stiller enjekte edecektir.
 - Stil kaydı için özellikle ağacın en üst seviyesinde bir İstemci Bileşeni kullanıyoruz çünkü CSS kurallarını bu şekilde çıkarmak daha verimli. Bu, sonraki sunucu render etme'lerinde stillerin yeniden oluşturulmasını ve Sunucu Bileşeni yükünde gönderilmesini önler.
+
+# Sass
+
+Next.js, hem `.scss` hem de `.sass` uzantılarını kullanarak Sass için yerleşik desteğe sahiptir. `module.scss` veya `.module.sass` uzantısı aracılığıyla bileşen düzeyinde Sass kullanabilirsiniz.
+
+İlk olarak, [`sass`](https://github.com/sass/sass) yükleyin:
+
+```terminal
+npm install --save-dev sass
+```
+
+**Bilmekte fayda var:**
+
+Sass, her biri kendi uzantısına sahip [iki farklı sözdizimini](https://sass-lang.com/documentation/syntax) destekler. `.scss` uzantısı [SCSS sözdizimini](https://sass-lang.com/documentation/syntax#scss) kullanmanızı gerektirirken, `.sass` uzantısı [Girintili Sözdizimini ("Sass")](https://sass-lang.com/documentation/syntax#the-indented-syntax) kullanmanızı gerektirir.
+
+Hangisini seçeceğinizden emin değilseniz, CSS'nin bir üst kümesi olan ve Girintili Sözdizimini ("Sass") öğrenmenizi gerektirmeyen `.scss` uzantısı ile başlayın.
+
+## Sass Seçeneklerini Özelleştirme
+
+Sass derleyicisini yapılandırmak istiyorsanız `next.config.js` dosyasında `sassOptions` seçeneğini kullanın.
+
+```js
+next.config.js;
+
+const path = require("path");
+
+module.exports = {
+  sassOptions: {
+    includePaths: [path.join(__dirname, "styles")],
+  },
+};
+```
+
+## Sass Değişkenleri
+
+Next.js, CSS Modülü dosyalarından dışa aktarılan Sass değişkenlerini destekler.
+
+Örneğin, dışa aktarılan `primaryColor` Sass değişkenini kullanarak:
+
+```scss
+
+app/variables.module.scss
+
+$primary-color: #64ff00;
+
+:export {
+  primaryColor: $primary-color;
+}
+```
+
+```js
+app / page.js;
+
+// maps to root `/` URL
+
+import variables from "./variables.module.scss";
+
+export default function Page() {
+  return <h1 style={{ color: variables.primaryColor }}>Hello, Next.js!</h1>;
+}
+```
+
+# Optimizasyonlar (Optimizations)
+
+Next.js, uygulamanızın hızını ve [Core Web Vitals](https://web.dev/vitals/)'ı iyileştirmek için tasarlanmış çeşitli yerleşik optimizasyonlarla birlikte gelir. Bu kılavuz, kullanıcı deneyiminizi geliştirmek için yararlanabileceğiniz optimizasyonları kapsayacaktır.
+
+## Yerleşik Bileşenler
+
+Yerleşik bileşenler, yaygın UI optimizasyonlarını uygulamanın karmaşıklığını ortadan kaldırır. Bu bileşenler şunlardır:
+
+- **Görüntüler:** Yerel `<img>` öğesi üzerine inşa edilmiştir. Görüntü Bileşeni, tembel yükleme ve görüntüleri cihaz boyutuna göre otomatik olarak yeniden boyutlandırma yoluyla görüntüleri performans için optimize eder.
+- **Bağlantı:** Yerel `<a>` etiketleri üzerine inşa edilmiştir. Bağlantı Bileşeni, daha hızlı ve daha yumuşak sayfa geçişleri için sayfaları arka planda önceden hazırlar.
+- **Komut Dosyaları:** Yerel `<script>` etiketleri üzerine inşa edilmiştir. Komut Dosyası Bileşeni, üçüncü taraf komut dosyalarının yüklenmesi ve yürütülmesi üzerinde kontrol sahibi olmanızı sağlar.
+
+## Metadata
+
+Meta veriler, arama motorlarının içeriğinizi daha iyi anlamasına yardımcı olur (bu da daha iyi SEO ile sonuçlanabilir) ve içeriğinizin sosyal medyada nasıl sunulduğunu özelleştirmenize olanak tanıyarak çeşitli platformlarda daha ilgi çekici ve tutarlı bir kullanıcı deneyimi oluşturmanıza yardımcı olur.
+
+Next.js'deki Metadata API, bir sayfanın `<head>` öğesini değiştirmenize olanak tanır. Meta verileri iki şekilde yapılandırabilirsiniz:
+
+- **Yapılandırma Tabanlı Meta Veriler:** Statik bir meta veri nesnesini veya dinamik bir generateMetadata işlevini bir `layout.js` veya `page.js` dosyasına aktarın.
+- **Dosya Tabanlı Meta Veriler:** Rota segmentlerine statik veya dinamik olarak oluşturulan özel dosyalar ekleyin.
+
+Ayrıca, imageResponse yapıcısı ile JSX ve CSS kullanarak dinamik Open Graph Görüntüleri oluşturabilirsiniz.
+
+## Statik Varlıklar
+
+Next.js `/public` klasörü resimler, yazı tipleri ve diğer dosyalar gibi statik varlıkları sunmak için kullanılabilir. `/public` içindeki dosyalar da CDN sağlayıcıları tarafından önbelleğe alınabilir, böylece verimli bir şekilde teslim edilirler.
+
+## Analitik ve İzleme
+
+Büyük uygulamalar için Next.js, uygulamanızın nasıl performans gösterdiğini anlamanıza yardımcı olmak için popüler analiz ve izleme araçlarıyla entegre olur.
