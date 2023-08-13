@@ -6272,3 +6272,765 @@ Zaten ayrı bir ESLint yapılandırması kullanıyorsanız ve `eslint-config-nex
 `next` yapılandırma, `parser`, `plugins` ve `settings` özellikleri için varsayılan değerlerin ayarlanmasını zaten ele alır. Kullanım durumunuz için farklı bir yapılandırmaya ihtiyaç duymadığınız sürece bu özelliklerden herhangi birini manuel olarak yeniden beyan etmenize gerek yoktur.
 
 Başka paylaşılabilir yapılandırmalar eklerseniz, bu özelliklerin üzerine yazılmadığından veya değiştirilmediğinden emin olmanız gerekir. Aksi takdirde, `next` yapılandırmayla davranış paylaşan tüm yapılandırmaları kaldırmanızı veya yukarıda belirtildiği gibi doğrudan Next.js ESLint eklentisinden genişletmenizi öneririz.
+
+# Ortam Değişkenleri (Environment Variables)
+
+Next.js, aşağıdakileri yapmanıza olanak tanıyan ortam değişkenleri için yerleşik destekle birlikte gelir:
+
+- Ortam değişkenlerini yüklemek için `.env.local` kullanın
+- `NEXT_PUBLIC_` ile önekleyerek tarayıcı için ortam değişkenlerini paketleyin
+
+## Ortam Değişkenlerini Yükleme
+
+Next.js, ortam değişkenlerini `.env.local`'den `process.env`'ye yüklemek için yerleşik desteğe sahiptir.
+
+```bash
+// .env.local
+
+
+DB_HOST=localhost
+DB_USER=myuser
+DB_PASS=mypassword
+```
+
+Bu, `process.env.DB_HOST`, `process.env.DB_USER` ve `process.env.DB_PASS` dosyalarını otomatik olarak Node.js ortamına yükler ve bunları Rota İşleyicilerinde kullanmanıza olanak tanır.
+
+Örneğin:
+
+```js
+// app/api/route.js
+
+export async function GET() {
+  const db = await myDB.connect({
+    host: process.env.DB_HOST,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+  });
+  // ...
+}
+```
+
+### Diğer Değişkenlere Referans Verme
+
+Next.js, `.env*` dosyalarınızın içindeki `$VARIABLE` gibi diğer değişkenlere referans vermek için `$` kullanan değişkenleri otomatik olarak genişletecektir. Bu, diğer gizliliklere referans vermenizi sağlar. Örneğin:
+
+```bash
+// .env
+TWITTER_USER=nextjs
+TWITTER_URL=https://twitter.com/$TWITTER_USER
+```
+
+Yukarıdaki örnekte, `process.env.TWITTER_URL` `https://twitter.com/nextjs` olarak ayarlanacaktır.
+
+**Bilmekte fayda var:** Gerçek değerinde `$` olan bir değişken kullanmanız gerekiyorsa, bunun öncelenmesi gerekir, örneğin `\$`.
+
+## Tarayıcı için Ortam Değişkenlerinin Paketlenmesi
+
+Non-`NEXT_PUBLIC_` ortam değişkenleri yalnızca Node.js ortamında kullanılabilir, yani tarayıcı tarafından erişilemezler (istemci farklı bir ortamda çalışır).
+
+Bir ortam değişkeninin değerini tarayıcıda erişilebilir kılmak için Next.js, derleme sırasında istemciye teslim edilen js paketine bir değer "satır içi" ekleyebilir ve `process.env.[variable]`'a yapılan tüm referansları sabit kodlanmış bir değerle değiştirebilir. Bunu yapmasını söylemek için değişkenin önüne `NEXT_PUBLIC_` eklemeniz yeterlidir. Örneğin:
+
+```terminal
+NEXT_PUBLIC_ANALYTICS_ID=abcdefghijk
+```
+
+Bu, Next.js'ye Node.js ortamındaki `process.env.NEXT_PUBLIC_ANALYTICS_ID`'ye yapılan tüm referansları `next build`'i çalıştırdığınız ortamdaki değerle değiştirmesini söyleyecek ve kodunuzun herhangi bir yerinde kullanmanıza izin verecektir. Tarayıcıya gönderilen tüm JavaScript'lerde satır içi olarak yer alacaktır.
+
+**Not:** Oluşturulduktan sonra, uygulamanız artık bu ortam değişkenlerindeki değişikliklere yanıt vermeyecektir. Örneğin, bir ortamda oluşturulan slug'ları başka bir ortama tanıtmak için bir Heroku pipeline kullanıyorsanız veya tek bir Docker görüntüsü oluşturup birden fazla ortama dağıtıyorsanız, tüm `NEXT_PUBLIC_` değişkenleri derleme zamanında değerlendirilen değerle dondurulacaktır, bu nedenle proje oluşturulduğunda bu değerlerin uygun şekilde ayarlanması gerekir. Çalışma zamanı ortam değerlerine erişmeniz gerekiyorsa, bunları istemciye sağlamak için kendi API'nizi kurmanız gerekir (talep üzerine veya başlatma sırasında).
+
+```js
+import setupAnalyticsService from "../lib/my-analytics-service";
+
+// 'NEXT_PUBLIC_ANALYTICS_ID', 'NEXT_PUBLIC_' ile ön ekli olduğu için burada kullanılabilir.
+// Derleme sırasında `setupAnalyticsService('abcdefghijk')` olarak dönüştürülecektir.
+
+setupAnalyticsService(process.env.NEXT_PUBLIC_ANALYTICS_ID);
+
+function HomePage() {
+  return <h1>Hello World</h1>;
+}
+
+export default HomePage;
+```
+
+Aşağıdaki gibi dinamik aramaların satır içi yapılmayacağını unutmayın:
+
+```js
+// Bu bir değişken kullandığı için satır içi yapılmayacaktır
+const varName = "NEXT_PUBLIC_ANALYTICS_ID";
+setupAnalyticsService(process.env[varName]);
+
+// Bu bir değişken kullandığı için satır içi yapılmayacaktır
+const env = process.env;
+setupAnalyticsService(env.NEXT_PUBLIC_ANALYTICS_ID);
+```
+
+## Varsayılan Ortam Değişkenleri
+
+Genel olarak yalnızca bir `.env.local` dosyası gereklidir. Ancak, bazen geliştirme (`next dev`) veya production (`next start`) ortamı için bazı varsayılanlar eklemek isteyebilirsiniz.
+
+Next.js, `.env` (tüm ortamlar), `.env.development` (geliştirme ortamı) ve `.env.production` (production ortamı) içinde varsayılanları ayarlamanıza olanak tanır.
+
+`.env.local` her zaman ayarlanan varsayılanları geçersiz kılar.
+
+**Bilmenizde fayda var:** `.env`, `.env.development` ve `.env.production` dosyaları varsayılanları tanımladıkları için deponuza dahil edilmelidir. `.env*.local` dosyaları `.gitignore`'a eklenmelidir, çünkü bu dosyaların göz ardı edilmesi amaçlanmıştır. `.env.local` gizli dosyaların saklanabileceği yerdir.
+
+## Vercel'de Ortam Değişkenleri
+
+Next.js uygulamanızı [Vercel](https://vercel.com/)'e deploy ederken, Ortam Değişkenleri [Proje Ayarları](https://vercel.com/docs/concepts/projects/environment-variables?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)'nda yapılandırılabilir.
+
+Her tür Ortam Değişkeni burada yapılandırılmalıdır. Geliştirmede kullanılan Ortam Değişkenleri bile - ki bunlar daha sonra [yerel cihazınıza indirilebilir](https://vercel.com/docs/concepts/projects/environment-variables#development-environment-variables?utm_source=next-site&utm_medium=docs&utm_campaign=next-website).
+
+[Geliştirme Ortam Değişkenlerini yapılandırdıysanız](https://vercel.com/docs/concepts/projects/environment-variables#development-environment-variables?utm_source=next-site&utm_medium=docs&utm_campaign=next-website), aşağıdaki komutu kullanarak bunları yerel makinenizde kullanmak üzere bir `.env.local` içine çekebilirsiniz:
+
+```Terminal
+vercel env pull .env.local
+```
+
+## Test Ortamı Değişkenleri
+
+`development` ve `production` ortamlarının yanı sıra 3. bir seçenek daha mevcuttur: `test`. Geliştirme veya production ortamları için varsayılanları ayarlayabileceğiniz gibi, aynı şeyi test ortamı için bir `.env.test` dosyası ile de yapabilirsiniz (ancak bu önceki ikisi kadar yaygın değildir). Next.js, `testing` ortamında `.env.development` veya `.env.production` dosyalarındaki ortam değişkenlerini yüklemeyecektir.
+
+Bu, yalnızca test amacıyla belirli ortam değişkenlerini ayarlamanız gereken `jest` veya `cypress` gibi araçlarla testler çalıştırırken kullanışlıdır. `NODE_ENV` `test` olarak ayarlanırsa test varsayılan değerleri yüklenecektir, ancak test araçları bunu sizin için ele alacağından genellikle bunu manuel olarak yapmanız gerekmez.
+
+`test` ortamı ile hem `development` hem de `production` arasında aklınızda bulundurmanız gereken küçük bir fark vardır: Testlerin herkes için aynı sonuçları üretmesini beklediğiniz için `.env.local` yüklenmeyecektir. Bu şekilde her test yürütmesi, `.env.local` (varsayılan seti geçersiz kılmak için tasarlanmıştır) dosyanızı yok sayarak farklı yürütmelerde aynı env varsayılanlarını kullanacaktır.
+
+**Bilmenizde fayda var:** Varsayılan Ortam Değişkenlerine benzer şekilde, `.env.test` dosyası deponuza dahil edilmelidir, ancak `.env.test.local` dosyası dahil edilmemelidir, çünkü `.env*.local` dosyasının `.gitignore` aracılığıyla göz ardı edilmesi amaçlanmıştır.
+
+Birim testlerini çalıştırırken, `@next/env` paketindeki `loadEnvConfig` işlevinden yararlanarak ortam değişkenlerinizi Next.js'nin yaptığı gibi yüklediğinizden emin olabilirsiniz.
+
+```js
+// // Aşağıdakiler, test kurulumunuz için bir Jest global kurulum dosyasında veya benzerinde kullanılabilir
+import { loadEnvConfig } from "@next/env";
+
+export default async () => {
+  const projectDir = process.cwd();
+  loadEnvConfig(projectDir);
+};
+```
+
+## Ortam Değişkeni Yük Sırası
+
+Ortam değişkenleri sırasıyla aşağıdaki yerlerde aranır ve değişken bulunduğunda durdurulur.
+
+1. `process.env`
+2. `.env.$(NODE_ENV).local`
+3. `.env.local` (`NODE_ENV` `test` olduğunda kontrol edilmez.)
+4. `.env.$(NODE_ENV)`
+5. `.env`
+
+Örneğin, `NODE_ENV` `development` ise ve hem `.env.development.local` hem de `.env`'de bir değişken tanımlarsanız, `.env.development.local`'deki değer kullanılır.
+
+**Bilmekte fayda var:** `NODE_ENV` için izin verilen değerler `development`, `production` ve `test`tir.
+
+## Bilmekte fayda var
+
+- Eğer bir `/src` dizini kullanıyorsanız, `.env.*` dosyaları projenizin kök dizininde kalmalıdır.
+- `NODE_ENV` ortam değişkeni atanmamışsa Next.js, `next dev` komutunu çalıştırırken otomatik olarak `development` veya diğer tüm komutlar için `production` ataması yapar.
+
+# Mutlak İçe Aktarmalar ve Modül Yolu Takma Adları (Absolute Imports and Module Path Aliases)
+
+Next.js, `tsconfig.json` ve `jsconfig.json` dosyalarının `"paths"` ve `"baseUrl"` seçenekleri için yerleşik destek sunar.
+
+Bu seçenekler, proje dizinlerini mutlak yollara takma ad olarak eklemenize olanak tanıyarak modülleri içe aktarmayı kolaylaştırır. Örneğin:
+
+```ts
+// önce
+import { Button } from "../../../components/button";
+
+// sonra
+import { Button } from "@/components/button";
+```
+
+**bilmekte fayda var:** `create-next-app`, bu seçenekleri sizin için yapılandırmayı önerir.
+
+## Mutlak İçe Aktarmalar (Absolute Imports)
+
+`baseUrl` yapılandırma seçeneği, projenin kökünden doğrudan içe aktarmanıza olanak tanır.
+
+Bu yapılandırmanın bir örneği:
+
+```json
+// tsconfig.json veya jsconfig.json
+
+{
+  "compilerOptions": {
+    "baseUrl": "."
+  }
+}
+```
+
+```typescript
+// components/button.tsx;
+
+export default function Button() {
+  return <button>Click me</button>;
+}
+```
+
+```js
+// app / page.tsx;
+
+import Button from "components/button";
+
+export default function HomePage() {
+  return (
+    <>
+      <h1>Hello World</h1>
+      <Button />
+    </>
+  );
+}
+```
+
+### Modül Takma Adları (Module Aliases)
+
+`baseUrl` yolu yapılandırmasına ek olarak, `"paths"` seçeneğini kullanarak modül yollarını "alias" olarak kullanabilirsiniz.
+
+Örneğin, aşağıdaki yapılandırma, `@/components/*`'ı `components/*`'a eşler:
+
+```json
+// tsconfig.json veya jsconfig.json
+
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/_": ["components/_"]
+    }
+  }
+}
+```
+
+```ts
+// components/button.tsx
+
+export default function Button() {
+  return <button>Click me</button>;
+}
+```
+
+```ts
+/// app/page.tsx
+
+import Button from "@/components/button";
+
+export default function HomePage() {
+  return (
+    <>
+      <h1>Hello World</h1>
+      <Button />
+    </>
+  );
+}
+```
+
+`"paths"` her biri `baseUrl` konumuna görelidir. Örneğin:
+
+```json
+// tsconfig.json veya jsconfig.json
+
+{
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "paths": {
+      "@/styles/_": ["styles/_"],
+      "@/components/_": ["components/_"]
+    }
+  }
+}
+```
+
+```js
+// pages/index.js
+
+import Button from "@/components/button";
+import "@/styles/styles.css";
+import Helper from "utils/helper";
+
+export default function HomePage() {
+  return (
+    <Helper>
+      <h1>Hello World</h1>
+      <Button />
+    </Helper>
+  );
+}
+```
+
+# MDX
+
+[Markdown](https://daringfireball.net/projects/markdown/syntax), metni biçimlendirmek için kullanılan hafif bir biçimlendirme dilidir. Düz metin sözdizimi kullanarak yazmanıza ve yapısal olarak geçerli HTML'ye dönüştürmenize olanak tanır. Genellikle web sitelerinde ve bloglarda içerik yazmak için kullanılır.
+
+Siz aşağıdakini yazdığınızda...
+
+```md
+I **love** using [Next.js](https://nextjs.org/)
+```
+
+Çıktı:
+
+```md
+<p> <a href="https://nextjs.org/">Next.js</a></p> kullanmayı <strong>seviyorum</strong>
+```
+
+[MDX](https://mdxjs.com/), [JSX](https://react.dev/learn/writing-markup-with-jsx)'i doğrudan markdown dosyalarınıza yazmanıza olanak tanıyan bir markdown üst kümesidir. Dinamik etkileşim eklemenin ve içeriğinize React bileşenleri yerleştirmenin güçlü bir yoludur.
+
+Next.js, hem uygulamanızın içindeki yerel MDX içeriğini hem de sunucudan dinamik olarak getirilen uzak MDX dosyalarını destekleyebilir. Next.js eklentisi, Sunucu Bileşenlerinde (`app`'de varsayılan) kullanım desteği de dahil olmak üzere Markdown ve React bileşenlerini HTML'ye dönüştürmeyi yönetir.
+
+## `@next/mdx`
+
+`@next/mdx` paketi, projelerinizin kök dizinindeki `next.config.js` dosyasında yapılandırılır. Yerel dosyalardan veri alır ve doğrudan `/pages` veya `/app` dizininizde `.mdx` uzantılı sayfalar oluşturmanıza olanak tanır.
+
+## Başlarken
+
+`@next/mdx` paketini yükleyin:
+
+```bash
+npm install @next/mdx @mdx-js/loader @mdx-js/react @types/mdx
+```
+
+Uygulamanızın kök dizininde (`app/` veya `src/` klasörünün üst dizini) `mdx-components.tsx` dosyasını oluşturun:
+
+```tsx
+///mdx-components.tsx
+
+import type { MDXComponents } from "mdx/types";
+
+// Bu dosya, MDX dosyalarında kullanılmak üzere
+// özel React bileşenleri sağlamanıza olanak tanır.
+// Diğer kütüphanelerdeki bileşenler de dahil olmak üzere
+// istediğiniz herhangi bir react bileşenini
+// içe aktarabilir ve kullanabilirsiniz.
+
+// Bu dosya MDX'i `app` dizininde kullanmak için gereklidir.
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    // Yerleşik bileşenlerin özelleştirilmesine, örneğin stil eklenmesine izin verir.
+    // h1: ({ children }) => <h1 style={{ fontSize: "100px" }}>{children}</h1>,
+    ...components,
+  };
+}
+```
+
+`next.config.js` dosyasını `mdxRs` kullanacak şekilde güncelleyin:
+
+```js
+///next.config.js
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    mdxRs: true,
+  },
+};
+
+const withMDX = require("@next/mdx")();
+module.exports = withMDX(nextConfig);
+```
+
+`app` dizininize MDX içerikli yeni bir dosya ekleyin:
+
+```mdx
+// app/hello.mdx
+
+Merhaba, Next.js!
+
+MDX dosyalarındaki React bileşenlerini içe aktarabilir ve kullanabilirsiniz.
+```
+
+İçeriği görüntülemek için `MDX` dosyasını bir `pages` içine aktarın:
+
+```tsx
+// app/page.tsx
+
+import HelloWorld from "./hello.mdx";
+
+export default function Page() {
+  return <HelloWorld />;
+}
+```
+
+## Uzaktan MDX (Remote MDX)
+
+Markdown veya MDX dosyalarınız uygulamanızın içinde yaşamıyorsa, bunları sunucudan dinamik olarak getirebilirsiniz. Bu, bir CMS'den veya başka bir veri kaynağından içerik almak için kullanışlıdır.
+
+MDX içeriğini almak için iki popüler topluluk paketi vardır: [`next-mdx-remote`](https://github.com/hashicorp/next-mdx-remote#react-server-components-rsc--nextjs-app-directory-support) ve [`contentlayer`](https://www.contentlayer.dev/). Örneğin, aşağıdaki örnek `next-mdx-remote` kullanmaktadır:
+
+**Bilmekte fayda var:** Lütfen dikkatli olun. MDX, JavaScript olarak derlenir ve sunucuda yürütülür. MDX içeriğini yalnızca güvenilir bir kaynaktan almalısınız, aksi takdirde bu durum uzaktan kod yürütülmesine (RCE) yol açabilir.
+
+```ts
+// app/page.tsx
+
+import { MDXRemote } from "next-mdx-remote/rsc";
+
+export default async function Home() {
+  const res = await fetch("https://...");
+  const markdown = await res.text();
+  return <MDXRemote source={markdown} />;
+}
+```
+
+## Düzenlemeler (Layouts)
+
+MDX içeriği etrafında bir düzen paylaşmak için Uygulama Yönlendiricisi ile [yerleşik düzen desteği](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#layouts)ni kullanabilirsiniz.
+
+## Remark ve Rehype Eklentileri
+
+MDX içeriğini dönüştürmek için isteğe bağlı olarak `remark` ve `rehype` eklentileri sağlayabilirsiniz. Örneğin, GitHub Flavored Markdown'ı desteklemek için `remark-gfm` kullanabilirsiniz.
+
+`remark` ve `rehype` ekosistemi yalnızca ESM olduğundan, yapılandırma dosyası olarak `next.config.mjs` dosyasını kullanmanız gerekir.
+
+```js
+//next.config.mjs
+
+import remarkGfm from "remark-gfm";
+import createMDX from "@next/mdx";
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
+
+const withMDX = createMDX({
+  options: {
+    extension: /\.mdx?$/,
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [],
+    // Eğer `MDXProvider` kullanıyorsanız, aşağıdaki satırı kaldırın.
+    // providerImportSource: "@mdx-js/react",
+  },
+});
+export default withMDX(nextConfig);
+```
+
+## Frontmatter
+
+Frontmatter, bir sayfa hakkındaki verileri depolamak için kullanılabilen YAML benzeri bir anahtar/değer eşleştirmesidir. Öntanımlı olarak `@next/mdx` frontmatter'ı desteklemez, ancak MDX içeriğinize frontmatter eklemek için [gray-matter](https://github.com/jonschlinkert/gray-matter) gibi birçok çözüm vardır.
+
+Sayfa meta verilerine `@next/mdx` ile erişmek için `.mdx` dosyası içinden bir meta nesnesini dışa aktarabilirsiniz:
+
+```mdx
+export const meta = {
+  author: 'Rich Haines',
+}
+ 
+# My MDX pag
+
+e
+```
+
+## Özel Unsurlar
+
+Markdown kullanmanın hoş yönlerinden biri, yerel `HTML` öğeleriyle eşleşerek yazmayı hızlı ve sezgisel hale getirmesidir:
+
+```md
+Bu markdown'da bir listedir:
+
+- Bir
+- İki
+- Üç
+```
+
+Yukarıdaki işlem aşağıdaki `HTML`'yi oluşturur:
+
+```html
+<p>Bu markdown'da bir listedir:</p>
+
+<ul>
+  <li>Bir</li>
+  <li>İki</li>
+  <li>Üç</li>
+</ul>
+```
+
+Web sitenize veya uygulamanıza özel bir his vermek için kendi öğelerinizi şekillendirmek istediğinizde, kısa kodları aktarabilirsiniz. Bunlar, `HTML` öğelerine eşlenen kendi özel bileşenlerinizdir. Bunu yapmak için `MDXProvider`'ı kullanır ve bir components nesnesini prop olarak geçirirsiniz. Components nesnesindeki her nesne anahtarı bir `HTML` öğesi adıyla eşleşir.
+
+Etkinleştirmek için `next.config.js` içinde `providerImportSource: "@mdx-js/react"` belirtmeniz gerekir:
+
+```js
+//next.config.js
+
+const withMDX = require("@next/mdx")({
+  // ...
+  options: {
+    providerImportSource: "@mdx-js/react",
+  },
+});
+```
+
+Ardından sağlayıcıyı sayfanızda ayarlayın
+
+```js
+//pages/index.js
+
+import { MDXProvider } from "@mdx-js/react";
+import Image from "next/image";
+import { Heading, InlineCode, Pre, Table, Text } from "my-components";
+
+const ResponsiveImage = (props) => (
+  <Görüntü
+    alt={props.alt}
+    sizes="100vw"
+    style={{ width: "100%", height: "auto" }}
+    {...props}
+  />
+);
+
+const bileşenler = {
+  img: ResponsiveImage,
+  h1: Heading.H1,
+  h2: Heading.H2,
+  p: Metin,
+  Öncesi: Öncesi,
+  kod: InlineCode,
+};
+
+export default function Post(props) {
+  dönüş(
+    <MDXProvider components={components}>
+      <main {...props} />
+    </MDXProvider>
+  );
+}
+```
+
+Site genelinde kullanıyorsanız, sağlayıcıyı `_app.js`'ye eklemek isteyebilirsiniz, böylece tüm MDX sayfaları özel öğe yapılandırmasını alır.
+
+## Derin Anlatım: Markdown'ı HTML'e nasıl dönüştürürsünüz?
+
+React, Markdown'ı yerel olarak anlamaz. Markdown düz metninin önce HTML'ye dönüştürülmesi gerekir. Bu, `remark` ve `rehype` ile gerçekleştirilebilir.
+
+`remark`, markdown etrafında bir araç ekosistemidir. `rehype` da aynıdır, ancak HTML içindir. Örneğin, aşağıdaki kod parçacığı markdown'u HTML'ye dönüştürür:
+
+```js
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeStringify from "rehype-stringify";
+
+main();
+
+async function main() {
+  const file = await unified()
+    .use(remarkParse) // Markdown AST'ye dönüştürme
+    .use(remarkRehype) // HTML AST'ye Dönüştürme
+    .use(rehypeSanitize) // HTML girdisini sterilize edin
+    .use(rehypeStringify) // AST'yi serileştirilmiş HTML'ye dönüştürme
+    .process("Hello, Next.js!");
+
+  console.log(String(file)); // <p>Hello, Next.js!</p>
+}
+```
+
+`remark` ve `rehype` ekosistemi, [sözdizimi vurgulama](https://github.com/atomiks/rehype-pretty-code), [başlıkları bağlama](https://github.com/rehypejs/rehype-autolink-headings), [içindekiler tablosu oluşturma](https://github.com/remarkjs/remark-toc) ve daha fazlası için eklentiler içerir.
+
+Aşağıda gösterildiği gibi `@next/mdx` kullanırken, sizin için halledildiğinden doğrudan `remark` ve `rehype` kullanmanıza gerek yoktur.
+
+## Rust tabanlı MDX derleyicisini kullanma (Deneysel)
+
+Next.js, Rust dilinde yazılmış yeni bir MDX derleyicisini desteklemektedir. Bu derleyici hala deneyseldir ve üretim kullanımı için önerilmez. Yeni derleyiciyi kullanmak için `next.config.js` dosyasını `withMDX`'e aktarırken yapılandırmanız gerekir:
+
+```js
+// next.config.js
+module.exports = withMDX({
+  experimental: {
+    mdxRs: true,
+  },
+});
+```
+
+## Yararlı Bağlantılar
+
+- [MDX](https://mdxjs.com/)
+- [`@next/mdx`](https://www.npmjs.com/package/@next/mdx)
+- [remark](https://github.com/remarkjs/remark)
+- [rehype](https://github.com/rehypejs/rehype)
+
+# src Dizini
+
+Projenizin kök dizininde özel Next.js `app` veya `pages` dizinlerine sahip olmaya alternatif olarak Next.js, uygulama kodunu `src` dizininin altına yerleştirmenin yaygın modelini de destekler.
+
+Bu, uygulama kodunu, bazı bireyler ve ekipler tarafından tercih edilen, çoğunlukla bir projenin kök dizininde bulunan proje yapılandırma dosyalarından ayırır.
+
+`src` dizinini kullanmak için, `app` Router klasörünü veya `pages` Router klasörünü sırasıyla `src/app` veya `src/pages` dizinine taşıyın.
+
+<img alt="src-dizini" src="https://nextjs.org/_next/image?url=%2Fdocs%2Fdark%2Fproject-organization-src-directory.png&w=1920&q=75&dpl=dpl_FgqPZgpvfTdBpYwq43qhnaRUcyXh"/>
+<br>
+
+**Bilmekte Fayda Var:**
+
+- `/public` dizini projenizin kök dizininde kalmalıdır.
+- `package.json`, `next.config.js` ve `tsconfig.json` gibi yapılandırma dosyaları projenizin kök dizininde kalmalıdır.
+- `.env.*` dosyaları projenizin kök dizininde kalmalıdır.
+- Kök dizinde `app` veya `pages` varsa `src/app` veya `src/pages` göz ardı edilecektir.
+- Eğer `src` kullanıyorsanız, muhtemelen `/components` veya `/lib` gibi diğer uygulama klasörlerini de taşıyacaksınız.
+- Tailwind CSS kullanıyorsanız, [içerik bölümündeki](https://tailwindcss.com/docs/content-configuration) `tailwind.config.js` dosyasına `/src` önekini eklemeniz gerekir.
+
+# Taslak Modu (Draft Mode)
+
+Statik oluşturma, sayfalarınız headless bir CMS'den veri aldığında kullanışlıdır. Ancak, headless CMS'nizde bir taslak yazarken ve taslağı hemen sayfanızda görüntülemek istediğinizde ideal değildir. Next.js'nin bu sayfaları derleme zamanı yerine istek zamanında oluşturmasını ve yayınlanan içerik yerine taslak içeriği getirmesini istersiniz. Next.js'in yalnızca bu özel durum için dinamik oluşturmaya geçmesini istersiniz.
+
+Next.js, bu sorunu çözen Taslak Modu adlı bir özelliğe sahiptir. İşte nasıl kullanılacağına dair talimatlar.
+
+## Adım 1: Rota İşleyiciyi oluşturun ve erişin (Create and access the route handler)
+
+İlk olarak, bir Rota İşleyicisi oluşturun. Herhangi bir isme sahip olabilir - örneğin `app/api/draft/route.ts`
+
+Ardından, `next/headers` öğesinden `draftMode` öğesini içe aktarın ve `enable()` yöntemini çağırın.
+
+```ts
+//app/api/draft/route.ts
+
+// taslak modunu etkinleştiren rota işleyicisi
+import { draftMode } from "next/headers";
+
+export async function GET(request: Request) {
+  draftMode().enable();
+  return new Response("Draft mode is enabled");
+}
+```
+
+Bu, taslak modunu etkinleştirmek için bir çerez ayarlayacaktır. Bu çerezi içeren sonraki istekler, statik olarak oluşturulan sayfaların davranışını değiştirerek Taslak Modunu tetikleyecektir (bu konuda daha sonra daha fazla bilgi verilecektir).
+
+Bunu `/api/draft` adresini ziyaret ederek ve tarayıcınızın geliştirici araçlarına bakarak manuel olarak test edebilirsiniz. `Set-Cookie` yanıt başlığının `__prerender_bypass` adlı bir çerez içerdiğine dikkat edin.
+
+### Headless CMS'nizden güvenli bir şekilde erişme
+
+Pratikte, bu Rota İşleyiciyi headless CMS'nizden güvenli bir şekilde çağırmak istersiniz. Belirli adımlar hangi headless CMS'yi kullandığınıza bağlı olarak değişecektir, ancak burada atabileceğiniz bazı genel adımlar vardır.
+
+Bu adımlar, kullandığınız headless CMS'nin özel taslak URL'leri ayarlamayı desteklediğini varsaymaktadır. Desteklemiyorsa, taslak URL'lerinizi güvence altına almak için bu yöntemi yine de kullanabilirsiniz, ancak taslak URL'yi manuel olarak oluşturmanız ve erişmeniz gerekir.
+
+**İlk olarak**, seçtiğiniz bir token oluşturucuyu kullanarak gizli bir token dizesi oluşturmalısınız. Bu sır yalnızca Next.js uygulamanız ve headless CMS'niz tarafından bilinecektir. Bu sır, CMS'nize erişimi olmayan kişilerin taslak URL'lere erişmesini engeller.
+
+**İkinci olarak**, headless CMS'niz özel taslak URL'lerin ayarlanmasını destekliyorsa, taslak URL olarak aşağıdakileri belirtin. Bu, Rota İşleyicinizin `app/api/draft/route.ts` adresinde bulunduğunu varsayar
+
+```Terminal
+
+https://<siteniz>/api/draft?secret=<token>&slug=<path>
+```
+
+- `<siteniz>` dağıtım alanınız olmalıdır.
+- `<token>`, oluşturduğunuz gizli belirteç ile değiştirilmelidir.
+- `<path>` görüntülemek istediğiniz sayfanın yolu olmalıdır. Eğer `/posts/foo` sayfasını görüntülemek istiyorsanız, `&slug=/posts/foo` kullanmalısınız.
+
+Headless CMS'niz taslak URL'ye bir değişken eklemenize izin verebilir, böylece `<path>` CMS'nin verilerine göre dinamik olarak şu şekilde ayarlanabilir: `&slug=/posts/{entry.fields.slug}`
+
+`Son olarak,` Rota İşleyicide:
+
+- Gizli bilginin eşleşip eşleşmediğini ve `slug` parametresinin var olup olmadığını kontrol edin (yoksa istek başarısız olmalıdır).
+- Çerezi ayarlamak için `draftMode.enable()` işlevini çağırın.
+- Ardından tarayıcıyı `slug` tarafından belirtilen yola yönlendirin.
+
+```ts
+//app/api/draft/route.ts
+
+// secret ve slug ile rota işleyicisi
+import { draftMode } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+export async function GET(request: İstek) {
+// Sorgu dizesi parametrelerini ayrıştır
+const { searchParams } = yeni URL(request.url)
+const secret = searchParams.get('secret')
+const slug = searchParams.get('slug')
+
+// Gizli ve sonraki parametreleri kontrol edin
+// Bu sır yalnızca bu rota işleyicisi ve CMS tarafından bilinmelidir
+if (secret !== 'MY_SECRET_TOKEN' || !slug) {
+return new Response('Invalid token', { status: 401 })
+}
+
+// Sağlanan `slug`ın var olup olmadığını kontrol etmek için headless CMS'yi getirin
+// getPostBySlug, headless CMS'ye gerekli getirme mantığını uygulayacaktır
+const post = await getPostBySlug(slug)
+
+// Eğer slug mevcut değilse taslak modunun etkinleştirilmesini engelleyin
+if (!post) {
+return new Response('Invalid slug', { status: 401 })
+}
+
+// Çerezi ayarlayarak Taslak Modunu etkinleştirin
+draftMode().enable()
+
+// Getirilen gönderideki yola yönlendir
+// Açık yönlendirme güvenlik açıklarına yol açabileceğinden searchParams.slug adresine yönlendirme yapmıyoruz
+redirect(post.slug)
+}
+```
+
+Başarılı olursa, tarayıcı taslak modu çerezi ile görüntülemek istediğiniz yola yönlendirilecektir.
+
+## Adım 2: Sayfayı güncelleyin
+
+Bir sonraki adım, sayfanızı `draftMode().isEnabled` değerini kontrol edecek şekilde güncellemektir.
+
+Çerezin ayarlandığı bir sayfayı talep ederseniz, veriler istek zamanında (derleme zamanı yerine) getirilecektir.
+
+Ayrıca, `isEnabled` değeri `true` olacaktır.
+
+```ts
+//app/page.tsx
+
+// veri getiren sayfa
+import { draftMode } from "next/headers";
+
+async function getData() {
+  const { isEnabled } = draftMode();
+
+  const url = isEnabled
+    ? "https://draft.example.com"
+    : "https://production.example.com";
+
+  const res = await fetch(url);
+
+  return res.json();
+}
+
+export default async function Page() {
+  const { title, desc } = await getData();
+
+  return (
+    <main>
+      <h1>{title}</h1>
+      <p>{desc}</p>
+    </main>
+  );
+}
+```
+
+İşte bu kadar! Taslak Rota İşleyicisine (`secret` ve `slug` ile) headless CMS'nizden veya manuel olarak erişirseniz, artık taslak içeriği görebilmeniz gerekir. Ve taslağınızı yayınlamadan güncellerseniz, taslağı görüntüleyebilmeniz gerekir.
+
+Bunu headless CMS'nizde taslak URL'si olarak ayarlayın veya manuel olarak erişin ve taslağı görebilmeniz gerekir.
+
+```terminal
+https://<your-site>/api/draft?secret=<token>&slug=<path>
+```
+
+## Daha Fazla Detay
+
+### Taslak Modu çerezini temizleyin
+
+Varsayılan olarak, Taslak Modu oturumu tarayıcı kapatıldığında sona erer.
+
+Taslak Modu çerezini manuel olarak temizlemek için `draftMode().disable()` çağrısı yapan bir Rota İşleyicisi oluşturun:
+
+```ts
+//app/api/disable-draft/route.ts;
+
+import { draftMode } from "next/headers";
+
+export async function GET(request: İstek) {
+  draftMode().disable();
+  return new Response("Taslak modu devre dışı");
+}
+```
+
+Ardından, Rota İşleyiciyi çağırmak için `/api/disable-draft` adresine bir istek gönderin. Bu rotayı `next/link` kullanarak çağırıyorsanız, prefetch'te çerezin yanlışlıkla silinmesini önlemek için `prefetch={false}` değerini geçmelisiniz.
+
+### `next build` için benzersiz
+
+`next build`'i her çalıştırdığınızda yeni bir bypass çerez değeri oluşturulacaktır.
+
+Bu, bypass çerezinin tahmin edilememesini sağlar.
+
+**Bilmekte fayda var:** Taslak Modunu HTTP üzerinden yerel olarak test etmek için tarayıcınızın üçüncü taraf çerezlerine ve yerel depolama erişimine izin vermesi gerekir.
