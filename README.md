@@ -45,6 +45,7 @@ Next.js'in bazı temel özellikleri şunlardır:
 - [Şekillendirme (Styling)](#şekillendirme-styling)
 - [Optimizasyonlar (Optimizations)](#optimizasyonlar-optimizations)
 - [Yapılandırma (Configuring))](#yapılandırma-configuring)
+- [Dağıtma (Deploying)](#dağıtma-deploying)
 
 # React'ın Temelleri (React Essentials)
 
