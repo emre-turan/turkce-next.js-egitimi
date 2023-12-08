@@ -310,3 +310,5 @@ Ek olarak, yeni `useRouter` hook'u aşağıdaki değişikliklere uğramıştır:
 - `isReady` kaldırılmıştır çünkü artık gerekli değildir. Statik renderlama sırasında, `useSearchParams()` kanca kullanan herhangi bir bileşen, ön işleme adımını atlayacak ve bunun yerine çalışma zamanında istemcide render edilecektir.
 
 ### Adım 6: Veri Getirme Yöntemlerini Taşıma
+
+//Translation of this page is not completed and not merged yet.
